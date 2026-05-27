@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  /* ネイビー系ダーク（VRChat寄り） */
+  --color-slate-900: #0C1421;
+  --color-slate-800: #142032;
+  --color-slate-700: #1C2D42;
+  --color-slate-600: #284059;
+  --color-slate-500: #7A8FA0;
+  --color-slate-400: #A0B4C4;
+  --color-slate-300: #C0D0E0;
+
+  /* シアン寄りティール（VRChatアクセント） */
+  --color-teal-600: #055060;
+  --color-teal-500: #0A7A90;
+  --color-teal-400: #00C8F0;
+  --color-teal-300: #60E0F8;
+
+  /* Discordブランドカラー */
+  --color-discord: #5865F2;
+  --color-discord-hover: #4752C4;
+}
+
+:root {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0C1421;
+  color: #e2e8f0;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* VRChat風グリッドライン背景 */
+.bg-grid {
+  background-color: #0C1421;
+  background-image:
+    linear-gradient(rgba(0, 200, 240, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 200, 240, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+}
+
+/* 背景画像時: UI カードを 15% 透過 */
+[data-has-bg] .bg-slate-800 {
+  background-color: rgba(20, 32, 50, 0.85);
+}
+
+/* グロー系ユーティリティ */
+.glow-teal {
+  filter: drop-shadow(0 0 8px rgba(0, 200, 240, 0.7));
+}
+.glow-teal-sm {
+  filter: drop-shadow(0 0 4px rgba(0, 200, 240, 0.5));
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #142032;
+}
+::-webkit-scrollbar-thumb {
+  background: #284059;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3A5570;
+}

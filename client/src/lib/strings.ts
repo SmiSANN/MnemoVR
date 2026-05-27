@@ -1,0 +1,177 @@
+export const strings = {
+  common: {
+    cancel: 'キャンセル',
+    discordLogin: 'Discord でログイン',
+    browserLoginPrompt: 'ブラウザでログインを完了してください',
+    loginFailed: 'ログインに失敗しました: ',
+    loading: '読み込み中...',
+    scanning: 'スキャン中...',
+    scanError: 'スキャンエラー: ',
+    authInvalid: '認証が無効',
+    noPhotos: '写真がありません。VRChatの写真フォルダをスキャンしてください。',
+  },
+
+  nav: {
+    ranking: 'ランキング',
+    worlds: 'ワールド',
+    calendar: 'カレンダー',
+    favorites: 'お気に入り',
+    settings: '設定',
+  },
+
+  appShell: {
+    noVrchatFolder: 'VRChatの写真フォルダが見つかりませんでした。設定画面からパスを指定してください。',
+    syncFailed: '同期失敗: ',
+  },
+
+  updateDialog: {
+    title: 'アップデートがあります',
+    newVersionPrefix: '新しいバージョン',
+    newVersionSuffix: 'が公開されています。',
+    downloadPrompt: 'GitHub からダウンロードしてください。',
+    skipVersion: 'このバージョンをスキップする',
+    openDownloadPage: 'ダウンロードページを開く',
+    later: '後で',
+  },
+
+  settings: {
+    title: '設定',
+    folderTitle: 'VRChat画像フォルダ',
+    folderHint: 'VRChatの写真が保存されているフォルダのパスを指定してください。デフォルト: ピクチャ\\VRChat',
+    saveButton: '保存',
+    dataTitle: 'データ管理',
+    fullScanButton: 'ローカルデータの再構築 (全数スキャン)',
+    cacheTitle: 'キャッシュ管理',
+    clearCacheButton: 'サムネイル・アップロードURLキャッシュの削除',
+    cacheHint: '生成済みサムネイル画像とアップロード済み画像URLキャッシュを削除します。サムネイルは次回表示時に再生成され、アップロードURLは次回アップロード時に再取得されます。',
+    accountTitle: 'ランキングアカウント',
+    loggedInWith: 'Discord でログイン中',
+    logoutButton: 'ログアウト',
+    syncNowButton: '今すぐ同期',
+    syncing: '同期中...',
+    loggingIn: 'ログイン中...',
+    loginHint: 'ランキングにデータを送信するにはログインが必要です。写真や個人情報は送信されません。',
+    autostartTitle: '自動起動',
+    autostartLabel: 'Windows 起動時にトレイで自動起動する',
+    autostartHint: '有効にすると Windows の起動と同時にトレイに常駐し、新しい写真の検知を継続します。',
+    autostartEnabled: '自動起動を有効にしました。',
+    autostartDisabled: '自動起動を無効にしました。',
+    autostartFailed: '自動起動の設定に失敗しました: ',
+    windowTitle: 'ウィンドウの動作',
+    backgroundToggleLabel: '×ボタンで閉じてもバックグラウンドで動き続ける',
+    backgroundToggleHint: '有効にするとウィンドウを閉じてもタスクトレイに残り、新しい写真の検知を継続します。トレイアイコンをクリックで再表示。',
+    backgroundToggleForcedHint: '自動起動が有効なため常にONです。',
+    settingsSaveFailed: '設定の保存に失敗しました: ',
+    pathSaved: '写真フォルダのパスを保存しました。',
+    pathSaveFailed: 'パスの保存に失敗しました: ',
+    noPath: '写真フォルダのパスを指定してください。',
+    cacheCleared: 'サムネイル・アップロードURLキャッシュを削除しました。',
+    cacheClearFailed: 'キャッシュの削除に失敗しました: ',
+    loginSuccessSuffix: 'としてログインしました。',
+    logoutSuccess: 'ログアウトしました。',
+    logoutFailed: 'ログアウトに失敗しました: ',
+    bgTitle: '背景画像',
+    bgSaved: '背景画像を設定しました。',
+    bgSaveFailed: '背景の保存に失敗しました: ',
+    bgCleared: '背景画像を解除しました。',
+    bgClearFailed: '背景の解除に失敗しました: ',
+  },
+
+  worlds: {
+    title: 'ワールド',
+    sortDateDesc: '最終撮影日 (新しい順)',
+    sortDateAsc: '最終撮影日 (古い順)',
+    sortNameAsc: 'ワールド名 (A→Z)',
+    sortNameDesc: 'ワールド名 (Z→A)',
+  },
+
+  favorites: {
+    title: 'お気に入り',
+    empty: 'お気に入りの写真がまだありません。写真を開いて★ボタンで追加できます。',
+  },
+
+  ranking: {
+    title: 'ランキング',
+    fetchFailed: 'ランキングの取得に失敗しました: ',
+    loginRequired: 'ランキングを表示するにはログインが必要です',
+    loginDescription: 'ログインすることでコミュニティのワールドランキングを閲覧・参加できます',
+    refresh: '更新',
+    noData: 'ランキングデータがありません',
+    noDataShort: 'データなし',
+    colAllTime: '歴代 (All-time)',
+    colWeekly: 'ウィークリー (Weekly)',
+    colDaily: 'デイリー (Daily)',
+  },
+
+  calendar: {
+    today: '今日',
+  },
+
+  store: {
+    favoriteFailed: 'お気に入りの切り替えに失敗しました: ',
+  },
+
+  uploadWarning: {
+    title: 'アップロードの確認',
+    message: '画像をアップロードし、URLをクリップボードにコピーします。アップロードした画像は公開状態になるので、個人情報や機密情報、公序良俗に反する内容を含む画像のアップロードはしないでください。',
+    doNotShowAgain: '二度と出さない',
+    upload: 'アップロード',
+  },
+
+  onboarding: {
+    termsTitle: '利用規約',
+    termsCheckbox: '利用規約を読み、内容に同意します',
+    agreeButton: '同意して次へ',
+    loginTitle: 'アカウントでログイン',
+    loginDescription: 'ログインするとワールドランキングにデータを提供できます。写真や個人情報は送信されません。',
+    or: 'または',
+    guestButton: 'ゲストとして利用',
+    guestHint: 'ゲストはランキングへのデータ提供・表示ができません',
+  },
+
+  fullScan: {
+    funTexts: [
+      '思い出を走査中...',
+      '深夜テンションで撮った写真を発掘しています...',
+      'あのワールドの名前、なんだっけ...',
+      'フレンドとの集合写真を整理中...',
+      'お気に入りのワールドを見つけています...',
+      'カメラロールがパンパンですね...',
+      '写真の海に飛び込んでいます...',
+    ],
+  },
+
+  lightbox: {
+    uploading: 'アップロード中...',
+    copied: 'コピーしました',
+    error: 'エラー',
+    createImageLink: '画像リンクを作る',
+  },
+
+  autoStartDialog: {
+    title: 'Windows 起動時に自動起動',
+    message: 'Windows の起動と同時に MnemoVR をトレイで自動起動しますか？新しい VRChat 写真の検知を継続できます。',
+    accept: '有効にする',
+    skip: 'スキップ',
+  },
+
+  about: {
+    title: 'MnemoVR について',
+  },
+
+  terms: {
+    title: 'MnemoVR 利用規約',
+    aboutHeading: '■ このアプリについて',
+    aboutBody: 'MnemoVR は VRChat のローカル写真を整理・閲覧するための非公式ツールです。VRChat Inc. とは無関係の個人開発プロジェクトです。',
+    dataHeading: '■ 収集するデータ',
+    dataBody: 'アプリはあなたのPC上にある VRChat 写真のメタデータ（撮影日時・ワールドID・ワールド名）のみを処理します。写真の画像データは一切サーバーに送信されません。',
+    serverHeading: '■ サーバーへの送信（オプトイン）',
+    serverBody: 'ランキング機能を利用する場合、「ワールドID・訪問日・写真枚数」の集計データをサーバーに送信します。この機能はログイン後に設定画面から手動で実行します。ゲストとして利用する場合、サーバーへのデータ送信は行われません。',
+    authHeading: '■ 認証情報',
+    authBody: 'Discord または Google でログインした場合、プロバイダーが提供するユーザーIDと表示名のみを取得します。メールアドレス・パスワード・フレンドリストなどは取得しません。',
+    disclaimerHeading: '■ 免責事項',
+    disclaimerBody: '本アプリの利用によって生じたいかなる損害についても、開発者は責任を負いません。VRChat の利用規約に従ってご利用ください。',
+    changesHeading: '■ 変更・終了',
+    changesBody: 'サービスの内容は予告なく変更・終了する場合があります。',
+  },
+};

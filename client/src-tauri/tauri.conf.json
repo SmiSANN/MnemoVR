@@ -1,0 +1,51 @@
+{
+  "productName": "MnemoVR",
+  "version": "0.2.5",
+  "identifier": "net.smisann.mnemovr",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "MnemoVR - VRChat Photo Album",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$HOME/**"]
+      },
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost https://asset.localhost data:; style-src 'self' 'unsafe-inline'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "SmiSANN",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "wix": {
+        "language": "ja-JP"
+      },
+      "nsis": {
+        "languages": ["Japanese"],
+        "installMode": "currentUser",
+        "installerHooks": "installer-hooks.nsi"
+      }
+    }
+  }
+}

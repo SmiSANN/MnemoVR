@@ -1,0 +1,9 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for MnemoVR",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "opener:default"
+  ]
+}

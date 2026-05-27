@@ -1,0 +1,8 @@
+HMAC_SECRET=your-secret-here
+
+# JWT署名用シークレット（十分に長いランダム文字列を使用）
+JWT_SECRET=your-jwt-secret-here
+
+# Discord OAuth アプリのクライアントID（公開情報・client/.env と同じ値）
+DISCORD_CLIENT_ID=your-discord-client-id
+

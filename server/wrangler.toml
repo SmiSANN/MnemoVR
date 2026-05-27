@@ -1,0 +1,8 @@
+name = "mnemovr-server"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mnemovr-db"
+database_id = "681c977f-0788-4be9-a5f4-a4e10651ea39"

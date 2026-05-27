@@ -1,0 +1,45 @@
+[package]
+name = "mnemovr"
+version = "0.2.5"
+edition = "2021"
+
+[lib]
+name = "mnemovr_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset", "tray-icon"] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+walkdir = "2"
+quick-xml = "0.37"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+tokio = { version = "1", features = ["full"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.22"
+urlencoding = "2"
+reqwest = { version = "0.12", features = ["json"] }
+dotenvy = "0.15"
+notify = "6"
+rfd = { version = "0.15", features = ["tokio"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_UI_Shell",
+    "Win32_UI_Shell_Common",
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Imaging",
+    "Win32_System_Com",
+    "Win32_System_Ole",
+] }

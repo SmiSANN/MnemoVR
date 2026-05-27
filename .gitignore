@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+client/dist/
+client/src-tauri/target/
+server/.wrangler/
+
+# Environment / secrets
+.env
+
+# Release scripts (contain private infra URLs)
+ARCHITECTURE.md
+release.bat
+release.ps1
+!.env.example
+.dev.vars
+!.dev.vars.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# Tauri
+client/src-tauri/gen/
+
+# Sample data
+docs/sample_photo.png
