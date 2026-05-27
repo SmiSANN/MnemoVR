@@ -1,6 +1,6 @@
 {
   "productName": "MnemoVR",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "identifier": "net.smisann.mnemovr",
   "build": {
     "frontendDist": "../dist",
