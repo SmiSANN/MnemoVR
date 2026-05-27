@@ -7,7 +7,7 @@ export function AboutSection() {
         {strings.about.title}
       </h3>
       <p className="text-xs text-slate-300">
-        Version 0.2.6 - MnemoVR VRChat Photo Album & World Ranking
+        Version 1.0.0 - MnemoVR VRChat Photo Album & World Ranking
       </p>
     </section>
   );
