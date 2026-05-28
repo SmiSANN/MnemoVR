@@ -70,3 +70,8 @@ export function readImageAsDataUrl(filePath: string): Promise<string> {
 export function pickImageFile(): Promise<string | null> {
   return invoke<string | null>("pick_image_file");
 }
+
+/** フォルダ選択ダイアログを開く。キャンセル時は null。 */
+export function pickFolder(): Promise<string | null> {
+  return invoke<string | null>("pick_folder");
+}

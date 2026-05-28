@@ -62,6 +62,7 @@ pub fn run() {
             commands::storage::set_cached_image_url,
             commands::storage::clear_thumbnail_cache,
             commands::storage::pick_image_file,
+            commands::storage::pick_folder,
             commands::storage::allow_asset_file,
             commands::storage::allow_asset_directory,
             commands::storage::read_image_as_data_url,

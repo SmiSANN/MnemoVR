@@ -9,6 +9,7 @@ import {
   setRunInBackground,
   oauthLogout,
   pickImageFile,
+  pickFolder,
   readImageAsDataUrl,
   getAuthStatus,
   syncToServer,
@@ -47,36 +48,44 @@ function FolderSection() {
     setInputPath(picturePath);
   }, [picturePath]);
 
-  async function handleSave() {
-    if (!inputPath) return;
+  async function applyPath(path: string) {
+    if (!path) return;
     try {
-      await setSetting("picture_path", inputPath);
-      setPicturePath(inputPath);
+      await setSetting("picture_path", path);
+      setPicturePath(path);
       addAlert({ id: "path-saved", type: "success", message: strings.settings.pathSaved });
     } catch (e) {
-      addAlert({
-        id: `path-error-${Date.now()}`,
-        type: "error",
-        message: `${strings.settings.pathSaveFailed}${e}`,
-      });
+      addAlert({ id: `path-error-${Date.now()}`, type: "error", message: `${strings.settings.pathSaveFailed}${e}` });
+    }
+  }
+
+  async function handlePickFolder() {
+    const path = await pickFolder().catch(() => null);
+    if (path) {
+      setInputPath(path);
+      await applyPath(path);
     }
   }
 
   return (
     <SettingsSection title={strings.settings.folderTitle} icon={<FolderOpen className="w-4 h-4" />}>
       <div className="flex gap-2">
-        <input
-          type="text"
-          value={inputPath}
-          onChange={(e) => setInputPath(e.target.value)}
-          placeholder="C:\Users\xxx\Pictures\VRChat"
-          className="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-400"
-        />
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={inputPath}
+            onChange={(e) => setInputPath(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && applyPath(inputPath)}
+            placeholder="C:\Users\xxx\Pictures\VRChat"
+            className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-400"
+          />
+        </div>
         <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white text-sm rounded transition-colors"
+          onClick={handlePickFolder}
+          title="フォルダを選択"
+          className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm rounded transition-colors"
         >
-          {strings.settings.saveButton}
+          <FolderSearch className="w-4 h-4" />
         </button>
       </div>
       <p className="text-xs text-slate-300 mt-2">{strings.settings.folderHint}</p>

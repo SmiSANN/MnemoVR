@@ -125,6 +125,13 @@ pub async fn pick_image_file() -> Result<Option<String>, String> {
     Ok(handle.map(|f| f.path().to_string_lossy().to_string()))
 }
 
+/// フォルダ選択ダイアログを開き、選択されたパスを返す。キャンセル時は None。
+#[tauri::command]
+pub async fn pick_folder() -> Result<Option<String>, String> {
+    let handle = rfd::AsyncFileDialog::new().pick_folder().await;
+    Ok(handle.map(|f| f.path().to_string_lossy().to_string()))
+}
+
 // --- 一括クリア ---
 
 /// サムネイルキャッシュとアップロード済み画像 URL キャッシュを削除する。
