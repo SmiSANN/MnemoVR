@@ -106,7 +106,7 @@ function Sidebar() {
         className="flex items-center gap-2 px-4 py-5 border-b border-slate-600/40"
         style={backgroundDataUrl ? undefined : { background: "linear-gradient(to right, #142032, rgba(5,80,96,0.1))" }}
       >
-        <MnemoIcon className="w-6 h-6 glow-teal" />
+        <MnemoIcon className="w-6 h-6 text-teal-400 glow-teal" />
         <h1 className="text-lg font-bold text-teal-400 glow-teal-sm tracking-wide">MnemoVR</h1>
       </div>
       <nav className="flex-1 py-3 px-2 flex flex-col">

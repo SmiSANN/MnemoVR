@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+  <defs>
+    <clipPath id="upper-left">
+      <polygon points="0,0 100,0 0,100"/>
+    </clipPath>
+    <clipPath id="lower-right">
+      <polygon points="100,0 100,100 0,100"/>
+    </clipPath>
+    <clipPath id="box-clip">
+      <rect x="4" y="4" width="92" height="92" rx="6"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#box-clip)">
+    <g clip-path="url(#upper-left)">
+      <line x1="10" y1="14" x2="26" y2="14" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="14" x2="62" y2="14" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="10" y1="24" x2="26" y2="24" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="24" x2="62" y2="24" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="10" y1="34" x2="26" y2="34" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="34" x2="62" y2="34" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="10" y1="44" x2="26" y2="44" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="44" x2="62" y2="44" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="10" y1="54" x2="26" y2="54" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="54" x2="62" y2="54" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="10" y1="64" x2="26" y2="64" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="64" x2="62" y2="64" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="10" y1="74" x2="26" y2="74" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="74" x2="62" y2="74" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+      <line x1="46" y1="84" x2="62" y2="84" stroke="#00C8F0" stroke-width="4.375" stroke-linecap="round"/>
+    </g>
+    <g clip-path="url(#lower-right)">
+      <circle cx="80" cy="42" r="8" fill="none" stroke="#00C8F0" stroke-width="4.375"/>
+      <polyline
+        points="4,96 45,55 55,62 65,50 80,58 96,70 96,96"
+        fill="none"
+        stroke="#00C8F0"
+        stroke-width="6.25"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+      />
+    </g>
+    <line x1="4" y1="96" x2="96" y2="4" stroke="#00C8F0" stroke-width="6.25" stroke-linecap="round"/>
+  </g>
+
+  <rect x="4" y="4" width="92" height="92" rx="6" fill="none" stroke="#00C8F0" stroke-width="7.5"/>
+</svg>
