@@ -1,41 +1,97 @@
+<div align="center">
+
+<img src="client/src-tauri/icons/128x128@2x.png" width="120" height="120" alt="MnemoVR icon" />
+
 # MnemoVR
 
-VRChat のローカル写真を整理するデスクトップアプリ (Tauri + React + Rust) と、
-ランキング同期用の Cloudflare Workers API を同一リポジトリで管理しています。
+**VRChat のローカル写真を、撮った場所と時間ごとに整理するデスクトップアプリ**
 
-## 概要
+![platform](https://img.shields.io/badge/platform-Windows-0078D6)
+![license](https://img.shields.io/badge/license-MIT-green)
+![built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-FFC131)
+
+<!-- TODO: アプリ全体が分かるメインスクリーンショットをここに差し込む -->
+<!-- 例: <img src="docs/screenshots/hero.png" width="800" alt="MnemoVR メイン画面" /> -->
+
+</div>
+
+---
+
+## これは何？
+
+MnemoVR は、VRChat が保存するローカル写真（`VRChat_*.png`）を自動でスキャンし、**カレンダー・ワールド・お気に入り**などの切り口で振り返れるデスクトップアプリです。写真のメタデータからワールド名や撮影日時を読み取り、訪れた場所ごとに思い出を整理します。
+
+さらに Discord ログインで、コミュニティ全体の **ワールドランキング** にデータを提供・閲覧できます（ログインせずゲストとして写真管理だけ使うことも可能です）。
+
+## 主な機能
+
+### 📸 写真管理
+- **自動取り込み**: 起動するだけで、新しく撮った写真をまとめて取り込み
+- **その場で反映**: フォルダに写真が増えたら、待たずに一覧へ反映
+- **大きく表示**: 写真をクリックしてフルスクリーン表示、お気に入りもワンクリック
+
+<!-- TODO: 写真一覧 / ライトボックスのスクリーンショット -->
+
+### 🗂️ 3 つのビューで振り返る
+| ビュー | 内容 |
+|---|---|
+| 📅 カレンダー | 月別・年別に写真を一覧 |
+| 🌐 ワールド | 訪れたワールドごとに写真をまとめて表示 |
+| ⭐ お気に入り | お気に入り登録した写真だけを表示 |
+
+<!-- TODO: カレンダービュー / ワールドビューのスクリーンショット -->
+
+### 🏆 ランキングと同期
+- Discord ログインでランキングへのデータ提供・閲覧が可能
+- 変更があったワールドのみを差分同期（スキャン後に自動実行）
+- ゲストモードでもすべての写真管理機能を利用可能
+
+### ⚙️ その他
+- **初回オンボーディング**: 利用規約への同意 → Discord ログイン / ゲストを選択
+- **アップデート通知**: 新バージョン公開時に通知（バージョン単位でスキップ可能）
+- **バックグラウンド常駐**: ウィンドウを閉じてもトレイに常駐
+- **サムネイルキャッシュ**: JPEG サムネイルをローカルにキャッシュして表示を高速化
+
+## ダウンロード
+
+<!-- TODO: GitHub Releases ページへのリンクに差し替える -->
+最新版は [Releases](../../releases) からダウンロードできます。
+
+| 対応 OS | 形式 |
+|---|---|
+| Windows | NSIS インストーラ (`.exe`) |
+
+## 使い方
+
+1. インストーラを実行して MnemoVR を起動
+2. 初回起動時に **利用規約に同意**
+3. **Discord ログイン**（ランキング機能を使う）か **ゲスト**（写真管理のみ）を選択
+4. 自動で写真フォルダがスキャンされ、カレンダー / ワールド / お気に入りから写真を振り返れます
+
+<!-- TODO: オンボーディング画面のスクリーンショット -->
+
+<br />
+
+---
+
+<br />
+
+# 開発者向けドキュメント
+
+VRChat 写真整理デスクトップアプリ（Tauri + React + Rust）と、ランキング同期用の Cloudflare Workers API を同一リポジトリで管理しています。
 
 - **クライアント**: ローカル写真スキャン・整理、カレンダー/ワールド/お気に入り/ランキング表示、Discord OAuth ログイン
 - **サーバー**: 同期 API、ランキング API、Discord トークン検証と JWT 発行
 - **同期**: HMAC 署名 + JWT で保護し、ワールド単位の集計ログを送信
 
-## 主な機能
+## 技術スタック
 
-### 写真管理
-- **フルスキャン**: ローカル写真 DB を再構築
-- **差分スキャン**: 起動時に追加分のみ更新
-- **ファイル監視**: `VRChat_*.png` の追加・削除を監視して UI を自動更新
-- **ライトボックス**: 写真クリックでフルスクリーン表示・お気に入り切り替え
-
-### ビュー
-| パス | 内容 |
+| レイヤー | 使用技術 |
 |---|---|
-| `/calendar` | 月別・年別の写真カレンダー |
-| `/worlds` | ワールドごとの写真一覧 |
-| `/favorites` | お気に入り写真一覧 |
-| `/ranking` | コミュニティワールドランキング |
-| `/settings` | 各種設定 |
-
-### ランキング・同期
-- Discord ログインでランキングへのデータ提供・閲覧が可能
-- ゲストモードでも写真管理は利用可能
-- 変更のあったワールドのみ差分同期（スキャン後に自動実行）
-
-### その他
-- **初回オンボーディング**: 利用規約同意 → Discord ログイン / ゲスト選択
-- **アップデート通知**: 新バージョン公開時に通知、バージョン単位でスキップ可能
-- **バックグラウンド実行**: ウィンドウを閉じてもトレイに常駐
-- **サムネイルキャッシュ**: JPEG サムネイルをローカルファイルにキャッシュ
+| Desktop | Tauri v2 |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Zustand, React Router |
+| Local backend | Rust, rusqlite (SQLite), tokio, notify, image, quick-xml |
+| Server | Cloudflare Workers, Hono, D1 |
 
 ## リポジトリ構成
 
@@ -58,15 +114,6 @@ MnemoVR/
 │   └── package.json
 └── README.md
 ```
-
-## 技術スタック
-
-| レイヤー | 使用技術 |
-|---|---|
-| Desktop | Tauri v2 |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Zustand, React Router |
-| Local backend | Rust, rusqlite (SQLite), tokio, notify, image, quick-xml |
-| Server | Cloudflare Workers, Hono, D1 |
 
 ## セットアップ
 
@@ -219,3 +266,7 @@ npm run dev          # ローカル Workers 起動
 npm run deploy       # 本番デプロイ
 npm run db:migrate   # D1 マイグレーション実行
 ```
+
+## ライセンス
+
+[MIT License](LICENSE) © 2026 SmiSANN
