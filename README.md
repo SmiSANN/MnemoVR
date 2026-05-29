@@ -1,41 +1,101 @@
+<div align="center">
+
+<img src="client/src-tauri/icons/128x128@2x.png" width="120" height="120" alt="MnemoVR icon" />
+
 # MnemoVR
 
-VRChat のローカル写真を整理するデスクトップアプリ (Tauri + React + Rust) と、
-ランキング同期用の Cloudflare Workers API を同一リポジトリで管理しています。
+**VRChat のローカル写真を、撮った場所と時間ごとに整理するデスクトップアプリ**
 
-## 概要
+![platform](https://img.shields.io/badge/platform-Windows-0078D6)
+![license](https://img.shields.io/badge/license-MIT-green)
+![built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-FFC131)
+
+
+</div>
+
+---
+
+## これは何？
+
+MnemoVR は、PC に保存された VRChat の写真（`VRChat_*.png`）を自動で読み込み、**カレンダー・ワールド・お気に入り**などの切り口で振り返れるデスクトップアプリです。写真に記録された情報からワールド名や撮影日時を読み取り、訪れた場所ごとに思い出を整理します。
+
+さらに Discord ログインすると、**「いまコミュニティで多く写真に撮られているワールド」のランキング**を閲覧でき、自分の記録もその集計に加わります。次に行く撮影スポット探しに使えます（ログインせずゲストとして写真管理だけ使うことも可能です）。
+
+## 主な機能
+
+### 📸 撮影記録の整理と活用
+- **自動取り込み**: 起動するだけで、新しく撮った写真をまとめて取り込み
+- **撮影情報の表示**: 写真に記録されたワールド名・撮影日時を自動で読み取り、どこで・いつ撮ったかを一覧で確認
+- **VRChat 用 URL を即発行**: 写真をアップロードして VRChat 内でそのまま使える画像 URL をその場で生成
+- **お気に入り登録**: 気に入った写真にワンクリックでフラグを立て、専用ビューでまとめて確認
+
+<table>
+  <tr>
+    <td><img src="photo/Photo.png" alt="写真一覧" /></td>
+    <td><img src="photo/Like.png" alt="お気に入りビュー" /></td>
+  </tr>
+</table>
+
+### 🗂️ 2 つのビューで振り返る
+| ビュー | 内容 |
+|---|---|
+| 📅 カレンダー | 月別・年別に写真を一覧 |
+| 🌐 ワールド | 訪れたワールドごとに写真をまとめて表示 |
+
+<table>
+  <tr>
+    <td><img src="photo/Calendar.png" alt="カレンダービュー" /></td>
+    <td><img src="photo/World.png" alt="ワールドビュー" /></td>
+  </tr>
+</table>
+
+### 🏆 ワールドランキング
+「どのワールドが、いま多くの人に写真に撮られているか」を利用者全体で集計して表示します。VRChat の人気・話題の撮影スポットを見つけるのに使えます。
+
+- **3 つの期間**: デイリー / ウィークリー / 歴代（All-time）
+- **スコア**: そのワールドで写真を撮った人数（多いほど上位）
+- 一覧の行をクリックすると VRChat のワールドページを開けます
+- 利用には Discord ログインが必要。ランキングの集計のためにサーバーへ送られるのは**ワールド単位の数値（ワールドID・日付・枚数）だけ**で、写真そのものは送信されません
+- ゲストモードでも、ランキング以外の機能はすべて利用できます
+
+<img src="photo/Ranking.png" width="800" alt="ワールドランキング" />
+
+## ダウンロード
+
+<!-- TODO: GitHub Releases ページへのリンクに差し替える -->
+最新版は [Releases](../../releases) からダウンロードできます。
+
+## 使い方
+
+1. インストーラを実行して MnemoVR を起動
+2. 初回起動時に **利用規約に同意**
+3. **Discord ログイン**（ランキング機能を使う）か **ゲスト**（写真管理のみ）を選択
+4. 既定の写真フォルダ（`ピクチャ\VRChat`）が自動で読み込まれ、カレンダー / ワールド / お気に入りから写真を振り返れます。別の場所に保存している場合は設定画面でフォルダを指定できます
+
+<!-- TODO: オンボーディング画面のスクリーンショット -->
+
+<br />
+
+---
+
+<br />
+
+# 開発者向けドキュメント
+
+VRChat 写真整理デスクトップアプリ（Tauri + React + Rust）と、ランキング同期用の Cloudflare Workers API を同一リポジトリで管理しています。
 
 - **クライアント**: ローカル写真スキャン・整理、カレンダー/ワールド/お気に入り/ランキング表示、Discord OAuth ログイン
 - **サーバー**: 同期 API、ランキング API、Discord トークン検証と JWT 発行
 - **同期**: HMAC 署名 + JWT で保護し、ワールド単位の集計ログを送信
 
-## 主な機能
+## 技術スタック
 
-### 写真管理
-- **フルスキャン**: ローカル写真 DB を再構築
-- **差分スキャン**: 起動時に追加分のみ更新
-- **ファイル監視**: `VRChat_*.png` の追加・削除を監視して UI を自動更新
-- **ライトボックス**: 写真クリックでフルスクリーン表示・お気に入り切り替え
-
-### ビュー
-| パス | 内容 |
+| レイヤー | 使用技術 |
 |---|---|
-| `/calendar` | 月別・年別の写真カレンダー |
-| `/worlds` | ワールドごとの写真一覧 |
-| `/favorites` | お気に入り写真一覧 |
-| `/ranking` | コミュニティワールドランキング |
-| `/settings` | 各種設定 |
-
-### ランキング・同期
-- Discord ログインでランキングへのデータ提供・閲覧が可能
-- ゲストモードでも写真管理は利用可能
-- 変更のあったワールドのみ差分同期（スキャン後に自動実行）
-
-### その他
-- **初回オンボーディング**: 利用規約同意 → Discord ログイン / ゲスト選択
-- **アップデート通知**: 新バージョン公開時に通知、バージョン単位でスキップ可能
-- **バックグラウンド実行**: ウィンドウを閉じてもトレイに常駐
-- **サムネイルキャッシュ**: JPEG サムネイルをローカルファイルにキャッシュ
+| Desktop | Tauri v2 |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Zustand, React Router |
+| Local backend | Rust, rusqlite (SQLite), tokio, notify, image, quick-xml |
+| Server | Cloudflare Workers, Hono, D1 |
 
 ## リポジトリ構成
 
@@ -54,19 +114,10 @@ MnemoVR/
 │   ├── src/
 │   │   └── routes/          # auth / sync / rankings / version
 │   ├── schema.sql
-│   ├── wrangler.toml
+│   ├── wrangler.toml           
 │   └── package.json
 └── README.md
 ```
-
-## 技術スタック
-
-| レイヤー | 使用技術 |
-|---|---|
-| Desktop | Tauri v2 |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Zustand, React Router |
-| Local backend | Rust, rusqlite (SQLite), tokio, notify, image, quick-xml |
-| Server | Cloudflare Workers, Hono, D1 |
 
 ## セットアップ
 
@@ -219,3 +270,7 @@ npm run dev          # ローカル Workers 起動
 npm run deploy       # 本番デプロイ
 npm run db:migrate   # D1 マイグレーション実行
 ```
+
+## ライセンス
+
+[MIT License](LICENSE) © 2026 SmiSANN
