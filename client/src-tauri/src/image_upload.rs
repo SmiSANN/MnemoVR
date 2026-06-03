@@ -15,7 +15,7 @@ fn prepare_for_upload(file_path: &str) -> Result<(Vec<u8>, &'static str), String
         .map_err(|e| format!("ファイル情報の取得に失敗しました: {e}"))?
         .len() as usize;
 
-    // 5MB 超 → リサイズして JPEG 圧縮
+    // リサイズして JPEG 圧縮
     let (rgb_pixels, width, height) = decode_and_resize(file_path)?;
 
     let rgb_image = image::RgbImage::from_raw(width, height, rgb_pixels)
