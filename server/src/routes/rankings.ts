@@ -1,7 +1,12 @@
 import { Hono } from "hono";
 import type { Env } from "../types";
-import { RANKINGS_CACHE_S_MAXAGE, RANKING_LIMIT } from "../constants";
+import {
+  RANKINGS_CACHE_S_MAXAGE,
+  RANKING_LIMIT,
+  WORLD_RESOLVE_CONCURRENCY,
+} from "../constants";
 import { isWorldNameStale, resolveAndCacheWorldName } from "../db/worlds";
+import { mapWithConcurrency } from "../util/concurrency";
 
 interface RankingRow {
   world_id: string;
@@ -81,11 +86,9 @@ rankingsRoute.get("/rankings", async (c) => {
   ];
 
   const resolved = new Map<string, string | null>();
-  await Promise.all(
-    idsToResolve.map(async (id) => {
-      resolved.set(id, await resolveAndCacheWorldName(id, c.env.DB));
-    }),
-  );
+  await mapWithConcurrency(idsToResolve, WORLD_RESOLVE_CONCURRENCY, async (id) => {
+    resolved.set(id, await resolveAndCacheWorldName(id, c.env.DB));
+  });
 
   const fill = (rows: RankingRow[]): RankingEntryOut[] =>
     rows.map(({ world_id, world_name, score }) => ({

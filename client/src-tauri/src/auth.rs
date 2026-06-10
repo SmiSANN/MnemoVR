@@ -32,8 +32,9 @@ fn generate_pkce() -> (String, String) {
 }
 
 /// ローカルHTTPサーバーでOAuthコールバックを1回だけ受信する。
+/// `expected_state` と一致しない state を受け取った場合は CSRF とみなし拒否する。
 /// タイムアウト: 2分。
-async fn wait_for_callback(listener: TcpListener) -> Result<String, String> {
+async fn wait_for_callback(listener: TcpListener, expected_state: &str) -> Result<String, String> {
     tokio::time::timeout(std::time::Duration::from_secs(120), async {
         let (mut stream, _) = listener
             .accept()
@@ -56,14 +57,21 @@ async fn wait_for_callback(listener: TcpListener) -> Result<String, String> {
 
         let mut code: Option<String> = None;
         let mut error: Option<String> = None;
+        let mut state: Option<String> = None;
         for pair in query.split('&') {
             if let Some((k, v)) = pair.split_once('=') {
                 match k {
                     "code" => code = Some(v.to_string()),
                     "error" => error = Some(v.to_string()),
+                    "state" => state = Some(v.to_string()),
                     _ => {}
                 }
             }
+        }
+
+        // CSRF 対策: 認可リクエスト時に生成した state と一致しなければ拒否
+        if state.as_deref() != Some(expected_state) {
+            return Err("state が一致しません（不正なコールバック）".to_string());
         }
 
         let body = if code.is_some() {
@@ -116,6 +124,9 @@ pub async fn start_oauth_login(
 
     let (code_verifier, code_challenge) = generate_pkce();
 
+    // CSRF 対策用の state（ランダム）。コールバックで一致を検証する。
+    let state = uuid::Uuid::new_v4().to_string();
+
     let listener = TcpListener::bind(format!("127.0.0.1:{OAUTH_CALLBACK_PORT}"))
         .await
         .map_err(|e| format!(
@@ -125,13 +136,14 @@ pub async fn start_oauth_login(
     let redirect_uri = format!("http://127.0.0.1:{OAUTH_CALLBACK_PORT}");
     let redirect_uri_encoded = urlencoding::encode(&redirect_uri).to_string();
 
-    // 認可URL（PKCEあり・公開クライアント）
+    // 認可URL（PKCEあり・公開クライアント・CSRF state あり）
     let auth_url = format!(
         "https://discord.com/oauth2/authorize\
         ?client_id={client_id}\
         &response_type=code\
         &redirect_uri={redirect_uri_encoded}\
         &scope=identify\
+        &state={state}\
         &code_challenge={code_challenge}\
         &code_challenge_method=S256"
     );
@@ -141,7 +153,7 @@ pub async fn start_oauth_login(
         .open_url(&auth_url, None::<&str>)
         .map_err(|e| format!("ブラウザを開けませんでした: {e}"))?;
 
-    let code = wait_for_callback(listener).await?;
+    let code = wait_for_callback(listener, &state).await?;
 
     // サーバーに code + code_verifier を送り、サーバー側でトークン交換してJWTを取得
     // （client_secret はサーバーのみが保持し、クライアントには渡さない）

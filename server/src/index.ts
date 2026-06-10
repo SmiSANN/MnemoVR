@@ -8,8 +8,20 @@ import { versionRoute } from "./routes/version";
 
 const app = new Hono<{ Bindings: Env }>();
 
-// 全エンドポイントに CORS を適用（クライアントは localhost から接続）
-app.use("*", cors());
+// CORS はブラウザからのクロスオリジン呼び出しのみを対象とする。
+// 正規クライアント（Tauri / reqwest）は Origin を送らないため影響を受けない。
+// 既定では全オリジンを拒否し、ALLOWED_ORIGINS に列挙したものだけ許可する。
+app.use("*", (c, next) =>
+  cors({
+    origin: (origin) => {
+      const allowed = (c.env.ALLOWED_ORIGINS ?? "")
+        .split(",")
+        .map((o) => o.trim())
+        .filter(Boolean);
+      return allowed.includes(origin) ? origin : null;
+    },
+  })(c, next),
+);
 
 // ヘルスチェック
 app.get("/", (c) => c.json({ status: "ok", service: "mnemovr-server" }));

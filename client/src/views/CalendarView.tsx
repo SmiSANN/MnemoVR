@@ -39,7 +39,12 @@ export function CalendarView() {
     });
     return map;
   }, [photos]);
-  const maxCount = useMemo(() => Math.max(1, ...photosByDate.values()), [photosByDate]);
+  const maxCount = useMemo(() => {
+    // 大量データでも安全なよう、スプレッド（引数上限）ではなくループで最大値を求める
+    let m = 1;
+    for (const v of photosByDate.values()) if (v > m) m = v;
+    return m;
+  }, [photosByDate]);
 
   // 写真がある日付のソート済みリスト（日付間ナビゲーション用）
   const sortedPhotoDates = useMemo(
@@ -570,9 +575,15 @@ function computeDateRange(photos: PhotoRecord[]): DateRange {
     const m = new Date(now.getFullYear(), now.getMonth(), 1);
     return { minMonth: m, maxMonth: m, minYear: m.getFullYear(), maxYear: m.getFullYear() };
   }
-  const timestamps = photos.map((p) => p.captured_at);
-  const minD = new Date(Math.min(...timestamps));
-  const maxD = new Date(Math.max(...timestamps));
+  // 大量データでスタックあふれしないよう、スプレッドではなくループで最小・最大を求める
+  let minTs = photos[0].captured_at;
+  let maxTs = photos[0].captured_at;
+  for (const p of photos) {
+    if (p.captured_at < minTs) minTs = p.captured_at;
+    if (p.captured_at > maxTs) maxTs = p.captured_at;
+  }
+  const minD = new Date(minTs);
+  const maxD = new Date(maxTs);
   return {
     minMonth: new Date(minD.getFullYear(), minD.getMonth(), 1),
     maxMonth: new Date(maxD.getFullYear(), maxD.getMonth(), 1),

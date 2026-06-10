@@ -5,6 +5,7 @@ import {
   scanLocalPhotos,
   getSetting,
   setSetting,
+  allowAssetDirectory,
   clearThumbnailCache,
   setRunInBackground,
   oauthLogout,
@@ -53,6 +54,8 @@ function FolderSection() {
     try {
       await setSetting("picture_path", path);
       setPicturePath(path);
+      // 新しいフォルダを asset:// スコープに追加（ライトボックス表示用）
+      allowAssetDirectory(path).catch(() => {});
       addAlert({ id: "path-saved", type: "success", message: strings.settings.pathSaved });
     } catch (e) {
       addAlert({ id: `path-error-${Date.now()}`, type: "error", message: `${strings.settings.pathSaveFailed}${e}` });

@@ -11,19 +11,37 @@ pub struct VrcMetadata {
     pub create_date: Option<String>,
 }
 
+/// XMP 探索に使う先頭チャンクサイズ。VRChat の XMP はファイル前方に埋め込まれるため、
+/// まずここだけ読み、見つからなければ残りを読むフォールバック方式にする。
+const XMP_FIRST_CHUNK: usize = 256 * 1024;
+const XMP_START_MARKER: &[u8] = b"<x:xmpmeta";
+const XMP_END_MARKER: &[u8] = b"</x:xmpmeta>";
+
 /// PNGファイルからXMPメタデータを抽出する。
 /// VRChatはPNGのtEXt/iTXtチャンクに <x:xmpmeta> 形式でXMPを埋め込んでいる。
+/// 画像全体（数MB）を読まずに、まず先頭チャンクのみを読んで高速化する。
 pub fn extract_xmp_from_png(file_path: &str) -> Result<VrcMetadata, String> {
-    let data = std::fs::read(file_path).map_err(|e| format!("Failed to read file: {e}"))?;
+    use std::io::Read;
 
-    // PNGバイナリからXMPブロックを検索
-    let xmp_start_marker = b"<x:xmpmeta";
-    let xmp_end_marker = b"</x:xmpmeta>";
+    let mut file = std::fs::File::open(file_path).map_err(|e| format!("Failed to open file: {e}"))?;
 
-    let xmp_xml = find_subsequence(&data, xmp_start_marker)
+    // まず先頭チャンクだけ読む
+    let mut data = Vec::with_capacity(XMP_FIRST_CHUNK);
+    file.by_ref()
+        .take(XMP_FIRST_CHUNK as u64)
+        .read_to_end(&mut data)
+        .map_err(|e| format!("Failed to read file: {e}"))?;
+
+    // 先頭チャンクに XMP 終端が無ければ残りも読み込む（フォールバック）
+    if find_subsequence(&data, XMP_END_MARKER).is_none() {
+        file.read_to_end(&mut data)
+            .map_err(|e| format!("Failed to read file: {e}"))?;
+    }
+
+    let xmp_xml = find_subsequence(&data, XMP_START_MARKER)
         .and_then(|start| {
-            find_subsequence(&data[start..], xmp_end_marker)
-                .map(|end| &data[start..start + end + xmp_end_marker.len()])
+            find_subsequence(&data[start..], XMP_END_MARKER)
+                .map(|end| &data[start..start + end + XMP_END_MARKER.len()])
         })
         .ok_or("No XMP metadata found in file")?;
 

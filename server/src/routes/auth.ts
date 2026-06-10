@@ -1,13 +1,18 @@
 import { Hono } from "hono";
 import type { Env } from "../types";
 import { signJwt } from "../jwt";
-import { JWT_EXPIRES_IN_S } from "../constants";
+import {
+  JWT_EXPIRES_IN_S,
+  RATE_LIMIT_AUTH_MAX,
+  RATE_LIMIT_AUTH_WINDOW_S,
+} from "../constants";
 import {
   exchangeDiscordCode,
   fetchDiscordUser,
   pickDiscordDisplayName,
 } from "../providers/discord";
 import { isUserBanned, upsertUser } from "../db/users";
+import { rateLimit } from "../middleware/rateLimit";
 
 export const authRoute = new Hono<{ Bindings: Env }>();
 
@@ -26,7 +31,14 @@ interface DiscordCallbackBody {
  *   4. BAN チェック
  *   5. JWT を発行して返す
  */
-authRoute.post("/auth/callback", async (c) => {
+authRoute.post(
+  "/auth/callback",
+  rateLimit({
+    route: "auth",
+    max: RATE_LIMIT_AUTH_MAX,
+    windowSeconds: RATE_LIMIT_AUTH_WINDOW_S,
+  }),
+  async (c) => {
   let body: DiscordCallbackBody;
   try {
     body = await c.req.json<DiscordCallbackBody>();
@@ -47,14 +59,17 @@ authRoute.post("/auth/callback", async (c) => {
       codeVerifier: body.code_verifier,
     });
   } catch (e) {
-    return c.json({ error: String(e) }, 401);
+    // 詳細（Discord の生エラー）はサーバーログのみに残し、クライアントには汎用メッセージを返す
+    console.error("Discord token exchange failed:", e);
+    return c.json({ error: "Authentication failed" }, 401);
   }
 
   let user;
   try {
     user = await fetchDiscordUser(accessToken);
   } catch (e) {
-    return c.json({ error: String(e) }, 401);
+    console.error("Discord user fetch failed:", e);
+    return c.json({ error: "Authentication failed" }, 401);
   }
 
   const displayName = pickDiscordDisplayName(user);
@@ -63,7 +78,8 @@ authRoute.post("/auth/callback", async (c) => {
   try {
     userId = await upsertUser(c.env.DB, "discord", user.id, displayName);
   } catch (e) {
-    return c.json({ error: String(e) }, 500);
+    console.error("User upsert failed:", e);
+    return c.json({ error: "Internal error" }, 500);
   }
 
   if (await isUserBanned(c.env.DB, userId)) {

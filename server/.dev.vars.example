@@ -6,3 +6,11 @@ JWT_SECRET=your-jwt-secret-here
 # Discord OAuth アプリのクライアントID（公開情報・client/.env と同じ値）
 DISCORD_CLIENT_ID=your-discord-client-id
 
+# 不正（存在しない）ワールド検知時に通知する Discord Webhook URL（任意）
+# 本番では secret として登録すること: wrangler secret put DISCORD_ALERT_WEBHOOK_URL
+DISCORD_ALERT_WEBHOOK_URL=
+
+# CORS を許可するブラウザオリジン（カンマ区切り・任意）。
+# 通常クライアントはネイティブなので未設定（全拒否）で問題ない。
+ALLOWED_ORIGINS=
+

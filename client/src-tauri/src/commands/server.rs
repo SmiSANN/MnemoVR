@@ -93,20 +93,25 @@ async fn build_name_map(
         .filter(|id| !name_map.contains_key(id))
         .collect();
 
-    let handles: Vec<_> = missing
-        .into_iter()
-        .map(|wid| {
-            let c = client.clone();
-            tokio::spawn(async move {
-                let name = vrchat_api::resolve_world_name(&c, &wid).await;
-                (wid, name)
+    // VRChat API への同時リクエスト数を抑える（レート制限・負荷対策）
+    const CONCURRENCY: usize = 6;
+    for chunk in missing.chunks(CONCURRENCY) {
+        let handles: Vec<_> = chunk
+            .iter()
+            .cloned()
+            .map(|wid| {
+                let c = client.clone();
+                tokio::spawn(async move {
+                    let name = vrchat_api::resolve_world_name(&c, &wid).await;
+                    (wid, name)
+                })
             })
-        })
-        .collect();
+            .collect();
 
-    for handle in handles {
-        if let Ok((wid, name)) = handle.await {
-            name_map.insert(wid, name);
+        for handle in handles {
+            if let Ok((wid, name)) = handle.await {
+                name_map.insert(wid, name);
+            }
         }
     }
     name_map

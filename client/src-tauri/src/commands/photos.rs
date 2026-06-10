@@ -17,6 +17,13 @@ pub async fn scan_local_photos(
 ) -> Result<Vec<PhotoRecord>, String> {
     let db = app.state::<AppDatabase>().0.clone();
 
+    // 写真フォルダを asset:// スコープに追加しておく。
+    // 静的スコープは APPDATA（サムネイルキャッシュ）に限定しているため、
+    // ライトボックスでオリジナル画像を表示するには対象フォルダの動的許可が必要。
+    let _ = app
+        .asset_protocol_scope()
+        .allow_directory(&target_path, true);
+
     // フルスキャン時は last_synced_at をリセット（次回 sync で全件送信）
     if full_scan {
         let _ = db.set_setting("last_synced_at", "0");

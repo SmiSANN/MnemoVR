@@ -22,6 +22,17 @@ impl Database {
         let conn =
             Connection::open(db_path).map_err(|e| format!("Failed to open database: {e}"))?;
 
+        // 書き込み性能向上のための PRAGMA 設定。
+        // WAL: 書き込み中も読み取り可能・コミットが高速。
+        // synchronous=NORMAL: WAL では安全性をほぼ保ちつつ fsync 回数を削減。
+        // busy_timeout: 並行アクセス時のロック競合を待機でやり過ごす。
+        conn.execute_batch(
+            "PRAGMA journal_mode=WAL;
+             PRAGMA synchronous=NORMAL;
+             PRAGMA busy_timeout=5000;",
+        )
+        .map_err(|e| format!("Failed to set pragmas: {e}"))?;
+
         // テーブルとインデックスの作成（初回起動時のみ実効）
         conn.execute_batch(
             "
@@ -101,13 +112,44 @@ impl Database {
         Ok(rows > 0)
     }
 
-    /// DB内の最新の captured_at を取得する（差分スキャンの閾値として使用）。
-    pub fn get_latest_captured_at(&self) -> Result<Option<i64>, String> {
-        let conn = self.conn.lock().map_err(|e| e.to_string())?;
-        let result: Option<i64> = conn
-            .query_row("SELECT MAX(captured_at) FROM photos", [], |row| row.get(0))
-            .map_err(|e| format!("Failed to query latest timestamp: {e}"))?;
-        Ok(result)
+    /// 複数の写真レコードを 1 トランザクションで一括 UPSERT する。
+    /// ファイルごとに独立トランザクションを張る場合に比べ fsync 回数が激減し、
+    /// 大量スキャン時の書き込みが大幅に高速化する。
+    pub fn upsert_photos(&self, records: &[PhotoRecord]) -> Result<(), String> {
+        if records.is_empty() {
+            return Ok(());
+        }
+        let mut conn = self.conn.lock().map_err(|e| e.to_string())?;
+        let tx = conn.transaction().map_err(|e| e.to_string())?;
+        {
+            let mut stmt = tx
+                .prepare(
+                    "INSERT INTO photos (id, file_path, world_id, world_name, user_id, user_name, captured_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+                     ON CONFLICT(file_path)
+                     DO UPDATE SET
+                        world_id = excluded.world_id,
+                        world_name = excluded.world_name,
+                        user_id = excluded.user_id,
+                        user_name = excluded.user_name,
+                        captured_at = excluded.captured_at",
+                )
+                .map_err(|e| format!("Failed to prepare batch upsert: {e}"))?;
+            for record in records {
+                stmt.execute(params![
+                    record.id,
+                    record.file_path,
+                    record.world_id,
+                    record.world_name,
+                    record.user_id,
+                    record.user_name,
+                    record.captured_at,
+                ])
+                .map_err(|e| format!("Failed to upsert photo: {e}"))?;
+            }
+        }
+        tx.commit().map_err(|e| format!("Failed to commit batch upsert: {e}"))?;
+        Ok(())
     }
 
     /// 全写真レコードを撮影日時の降順で取得する。
@@ -182,6 +224,27 @@ impl Database {
             params![world_id],
         )
         .map_err(|e| format!("Failed to propagate world name: {e}"))?;
+        Ok(())
+    }
+
+    /// 複数の world_id について、最新 captured_at の world_name を同一ワールドの全写真へ
+    /// 1 トランザクション・1 ステートメントで一括伝播する。
+    pub fn propagate_world_names(&self, world_ids: &[String]) -> Result<(), String> {
+        if world_ids.is_empty() {
+            return Ok(());
+        }
+        let placeholders = world_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
+        let sql = format!(
+            "UPDATE photos SET world_name = (
+                SELECT p2.world_name FROM photos p2
+                WHERE p2.world_id = photos.world_id AND p2.world_name IS NOT NULL
+                ORDER BY p2.captured_at DESC LIMIT 1
+             )
+             WHERE world_id IN ({placeholders})"
+        );
+        let conn = self.conn.lock().map_err(|e| e.to_string())?;
+        conn.execute(&sql, rusqlite::params_from_iter(world_ids.iter()))
+            .map_err(|e| format!("Failed to propagate world names: {e}"))?;
         Ok(())
     }
 

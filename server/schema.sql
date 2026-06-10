@@ -36,3 +36,12 @@ CREATE TABLE IF NOT EXISTS world_visits (
 );
 
 CREATE INDEX IF NOT EXISTS idx_world_last_visited ON world_visits(world_id, last_visited_date);
+
+-- レート制限カウンタ（固定ウィンドウ方式。k = route:ip:windowIndex）
+CREATE TABLE IF NOT EXISTS rate_limits (
+    k TEXT PRIMARY KEY,
+    count INTEGER NOT NULL DEFAULT 0,
+    expires_at INTEGER NOT NULL  -- Unix 秒。これ以前のレコードは掃除対象
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_expires ON rate_limits(expires_at);

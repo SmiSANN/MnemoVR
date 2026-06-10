@@ -78,6 +78,8 @@ pub async fn scan_photos(
     full_scan: bool,
     db: Arc<Database>,
 ) -> Result<Vec<PhotoRecord>, String> {
+    use std::collections::HashSet;
+
     let target = target_path.to_string();
     let db_clone = db.clone();
 
@@ -89,31 +91,30 @@ pub async fn scan_photos(
         purge_missing_photos(&db)?;
     }
 
-    // 差分スキャンの閾値（フルスキャンならNone＝全件対象）
-    let threshold = if full_scan {
-        None
+    // 既存ファイルパスを一度だけ読み込んで集合化（フルスキャン時は clear 済みなので空）。
+    // ファイルごとに file_exists クエリを発行するのを避ける。
+    let existing_paths: HashSet<String> = if full_scan {
+        HashSet::new()
     } else {
-        db.get_latest_captured_at()?
+        db.get_all_photo_paths()?.into_iter().collect()
     };
 
     // ファイルI/Oはブロッキングスレッドで実行
-    let new_records = tokio::task::spawn_blocking(move || {
-        scan_directory(&target, threshold, &db_clone)
+    let inserted = tokio::task::spawn_blocking(move || {
+        scan_directory(&target, existing_paths, &db_clone)
     })
     .await
-    .map_err(|e| format!("Task join error: {e}"))?;
+    .map_err(|e| format!("Task join error: {e}"))??;
 
-    let inserted = new_records?;
-
-    // 同一ワールドの全写真に最新 XMP ワールド名を伝播（world_id ごとに1回のみ実行）
-    let mut seen_world_ids = std::collections::HashSet::new();
-    for record in &inserted {
-        if let Some(wid) = &record.world_id {
-            if record.world_name.is_some() && seen_world_ids.insert(wid.clone()) {
-                let _ = db.propagate_world_name_from_newest(wid);
-            }
-        }
-    }
+    // 同一ワールドの全写真に最新 XMP ワールド名を伝播（変更のあったワールドのみ一括実行）
+    let mut seen_world_ids = HashSet::new();
+    let changed_worlds: Vec<String> = inserted
+        .iter()
+        .filter(|r| r.world_name.is_some())
+        .filter_map(|r| r.world_id.clone())
+        .filter(|wid| seen_world_ids.insert(wid.clone()))
+        .collect();
+    let _ = db.propagate_world_names(&changed_worlds);
 
     // DB内の全写真を返す（既存＋新規）
     db.get_all_photos()
@@ -133,10 +134,11 @@ fn purge_missing_photos(db: &Database) -> Result<(), String> {
 }
 
 /// ディレクトリを再帰走査し、VRChat写真（VRChat_*.png）を検出してDBに挿入する。
-/// threshold が Some の場合は差分スキャン：閾値以前の既存ファイルをスキップする。
+/// `existing_paths` に含まれるパスは登録済みとみなしてスキップする（差分スキャン）。
+/// 新規ファイルは収集後に 1 トランザクションで一括 UPSERT する。
 fn scan_directory(
     target_path: &str,
-    threshold: Option<i64>,
+    existing_paths: std::collections::HashSet<String>,
     db: &Database,
 ) -> Result<Vec<PhotoRecord>, String> {
     let mut inserted = Vec::new();
@@ -161,8 +163,8 @@ fn scan_directory(
 
         let file_path_str = path.to_string_lossy().to_string();
 
-        // 差分スキャン: DB登録済みファイルはスキップ
-        if threshold.is_some() && db.file_exists(&file_path_str).unwrap_or(false) {
+        // 差分スキャン: DB登録済みファイル（メモリ上の集合に存在）はスキップ
+        if existing_paths.contains(&file_path_str) {
             continue;
         }
 
@@ -183,15 +185,7 @@ fn scan_directory(
                 }
             };
 
-        // 差分スキャン: 閾値以前の日付かつDB登録済みならスキップ
-        // （古い日付の新規ファイルは通す）
-        if let Some(thresh) = threshold {
-            if captured_at <= thresh && db.file_exists(&file_path_str).unwrap_or(false) {
-                continue;
-            }
-        }
-
-        let record = PhotoRecord {
+        inserted.push(PhotoRecord {
             id: uuid::Uuid::new_v4().to_string(),
             file_path: file_path_str,
             world_id,
@@ -200,16 +194,11 @@ fn scan_directory(
             user_name: author_name,
             captured_at,
             is_favorite: false,
-        };
-
-        // DBに保存
-        if let Err(e) = db.upsert_photo(&record) {
-            eprintln!("Failed to upsert photo {}: {}", record.file_path, e);
-            continue;
-        }
-
-        inserted.push(record);
+        });
     }
+
+    // 収集した新規レコードを 1 トランザクションで一括保存
+    db.upsert_photos(&inserted)?;
 
     Ok(inserted)
 }

@@ -58,7 +58,14 @@ export const useAppStore = create<AppState>((set) => ({
     set((state) => ({ alerts: state.alerts.filter((a) => a.id !== id) })),
 
   addPhoto: (photo) =>
-    set((state) => ({ photos: [...state.photos, photo] })),
+    set((state) => {
+      // 撮影日時の降順を保つ位置へ挿入（末尾追加だと新着が最後尾に来てしまう）
+      const idx = state.photos.findIndex((p) => p.captured_at <= photo.captured_at);
+      const next = [...state.photos];
+      if (idx === -1) next.push(photo);
+      else next.splice(idx, 0, photo);
+      return { photos: next };
+    }),
 
   removePhotoByPath: (filePath) =>
     set((state) => ({
