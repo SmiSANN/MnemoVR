@@ -10,7 +10,7 @@ use tauri::{AppHandle, Manager};
 pub async fn oauth_login(app: AppHandle) -> Result<AuthStatus, String> {
     let db = app.state::<AppDatabase>().0.clone();
     let status = start_oauth_login(db.clone(), &app).await?;
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         let _ = crate::sync::sync_to_server(db).await;
     });
     Ok(status)

@@ -37,7 +37,7 @@ pub fn run() {
             setup_app_state(app)?;
             tray::setup_tray(app)?;
             tray::install_close_handler(app);
-            sync::start_auto_sync(app.state::<AppDatabase>().0.clone());
+            tauri::async_runtime::spawn(sync::auto_sync_loop(app.state::<AppDatabase>().0.clone()));
             // --autostart フラグがある場合はウィンドウを非表示で起動（トレイ常駐）
             if std::env::args().any(|a| a == "--autostart") {
                 if let Some(w) = app.get_webview_window("main") {

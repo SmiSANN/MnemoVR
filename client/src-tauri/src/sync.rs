@@ -176,15 +176,12 @@ pub async fn sync_to_server(db: Arc<Database>) -> Result<String, String> {
     }
 }
 
-/// 20分ごとにバックグラウンドで自動同期するタスクを起動する。
-/// アプリ起動時に一度だけ呼ぶ。
-pub fn start_auto_sync(db: Arc<Database>) {
-    tokio::spawn(async move {
-        loop {
-            tokio::time::sleep(std::time::Duration::from_secs(20 * 60)).await;
-            let _ = sync_to_server(db.clone()).await;
-        }
-    });
+/// 20分ごとに自動同期するループ。`tauri::async_runtime::spawn` で起動する。
+pub async fn auto_sync_loop(db: Arc<Database>) {
+    loop {
+        tokio::time::sleep(std::time::Duration::from_secs(20 * 60)).await;
+        let _ = sync_to_server(db.clone()).await;
+    }
 }
 
 #[cfg(test)]
