@@ -72,8 +72,8 @@ function validateLog(log: unknown, today: string): string | null {
 
 /**
  * 同期されたワールドのうち、VRChat に存在しないものを検知し、
- * 該当ユーザーの Discord 情報を Webhook で通知したうえで、
- * その不正レコードを world_visits から削除する。
+ * 該当ユーザーの Discord 情報を Webhook で通知する。
+ * レコードの削除は行わない（削除済みワールドの訪問履歴も保持する）。
  * （sync レスポンスをブロックしないよう waitUntil で非同期実行する）
  */
 async function detectAndReportInvalidWorlds(
@@ -103,14 +103,6 @@ async function detectAndReportInvalidWorlds(
   );
   const invalid = checks.filter((r) => r.exists === false).map((r) => r.id);
   if (invalid.length === 0) return;
-
-  // 不正レコードを削除
-  const delPlaceholders = invalid.map(() => "?").join(",");
-  await c.env.DB.prepare(
-    `DELETE FROM world_visits WHERE user_id = ? AND world_id IN (${delPlaceholders})`,
-  )
-    .bind(userId, ...invalid)
-    .run();
 
   // Discord に通知
   const info = await getUserDiscordInfo(c.env.DB, userId);
