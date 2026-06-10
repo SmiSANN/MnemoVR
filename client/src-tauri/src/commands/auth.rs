@@ -9,7 +9,11 @@ use tauri::{AppHandle, Manager};
 #[tauri::command]
 pub async fn oauth_login(app: AppHandle) -> Result<AuthStatus, String> {
     let db = app.state::<AppDatabase>().0.clone();
-    start_oauth_login(db, &app).await
+    let status = start_oauth_login(db.clone(), &app).await?;
+    tokio::spawn(async move {
+        let _ = crate::sync::sync_to_server(db).await;
+    });
+    Ok(status)
 }
 
 /// ログアウトする（DB から JWT と認証情報を削除）。

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RefreshCw, Trash2, FolderOpen, Image, LogIn, LogOut, Upload, Wallpaper, FolderSearch } from "lucide-react";
+import { RefreshCw, Trash2, FolderOpen, Image, LogIn, LogOut, Wallpaper, FolderSearch } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
 import {
   scanLocalPhotos,
@@ -13,7 +13,6 @@ import {
   pickFolder,
   readImageAsDataUrl,
   getAuthStatus,
-  syncToServer,
   setAutostartEnabled,
 } from "../api";
 import type { AuthStatus } from "../api/auth";
@@ -179,7 +178,6 @@ function CacheSection() {
 function AccountSection() {
   const { addAlert, setAuthStatus: setGlobalAuthStatus } = useAppStore();
   const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     getAuthStatus().then(setAuthStatus);
@@ -214,23 +212,6 @@ function AccountSection() {
     }
   }
 
-  async function handleSync() {
-    setIsSyncing(true);
-    try {
-      const msg = await syncToServer();
-      addAlert({ id: `sync-ok-${Date.now()}`, type: "success", message: msg });
-    } catch (e) {
-      const msg = String(e);
-      if (msg.includes(strings.common.authInvalid)) {
-        setAuthStatus(null);
-        setGlobalAuthStatus(null);
-      }
-      addAlert({ id: `sync-error-${Date.now()}`, type: "error", message: msg });
-    } finally {
-      setIsSyncing(false);
-    }
-  }
-
   return (
     <SettingsSection title={strings.settings.accountTitle} icon={<LogIn className="w-4 h-4" />}>
       {authStatus ? (
@@ -248,14 +229,6 @@ function AccountSection() {
               {strings.settings.logoutButton}
             </button>
           </div>
-          <button
-            onClick={handleSync}
-            disabled={isSyncing}
-            className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:bg-slate-600 disabled:text-slate-300 text-white text-sm rounded-lg transition-colors"
-          >
-            <Upload className="w-4 h-4" />
-            {isSyncing ? strings.settings.syncing : strings.settings.syncNowButton}
-          </button>
         </div>
       ) : (
         <button

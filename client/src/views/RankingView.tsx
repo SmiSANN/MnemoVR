@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Trophy, Medal, Award, RefreshCw, LogIn } from "lucide-react";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { fetchRankings, getAuthStatus, syncToServer } from "../api";
+import { fetchRankings, getAuthStatus } from "../api";
 import type { RankingEntry, RankingsData } from "../api/server";
 import type { AuthStatus } from "../api/auth";
 import { useOAuthLogin } from "../hooks/useOAuthLogin";
@@ -96,7 +96,6 @@ function LoginGate({ onLoggedIn }: { onLoggedIn: (auth: AuthStatus) => void }) {
   );
 }
 
-const SYNC_INTERVAL_MS = 10 * 60 * 1000; // 10分（ランキングキャッシュと同じ間隔）
 
 export function RankingView() {
   const [rankings, setRankings] = useState<RankingsData | null>(null);
@@ -122,15 +121,8 @@ export function RankingView() {
     }
   }, []);
 
-  // ログイン済みなら起動時に同期 → ランキング取得
   useEffect(() => {
     if (!authStatus) return;
-    const lastSync = Number(sessionStorage.getItem("lastSyncAt") || "0");
-    if (Date.now() - lastSync > SYNC_INTERVAL_MS) {
-      syncToServer()
-        .then(() => sessionStorage.setItem("lastSyncAt", String(Date.now())))
-        .catch(() => {});
-    }
     loadRankings();
   }, [loadRankings, authStatus]);
 
