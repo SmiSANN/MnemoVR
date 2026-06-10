@@ -570,24 +570,20 @@ function neighborDay(
 }
 
 function computeDateRange(photos: PhotoRecord[]): DateRange {
+  const now = new Date();
+  const m = new Date(now.getFullYear(), now.getMonth(), 1);
   if (photos.length === 0) {
-    const now = new Date();
-    const m = new Date(now.getFullYear(), now.getMonth(), 1);
     return { minMonth: m, maxMonth: m, minYear: m.getFullYear(), maxYear: m.getFullYear() };
   }
-  // 大量データでスタックあふれしないよう、スプレッドではなくループで最小・最大を求める
   let minTs = photos[0].captured_at;
-  let maxTs = photos[0].captured_at;
   for (const p of photos) {
     if (p.captured_at < minTs) minTs = p.captured_at;
-    if (p.captured_at > maxTs) maxTs = p.captured_at;
   }
   const minD = new Date(minTs);
-  const maxD = new Date(maxTs);
   return {
     minMonth: new Date(minD.getFullYear(), minD.getMonth(), 1),
-    maxMonth: new Date(maxD.getFullYear(), maxD.getMonth(), 1),
+    maxMonth: m,
     minYear: minD.getFullYear(),
-    maxYear: maxD.getFullYear(),
+    maxYear: m.getFullYear(),
   };
 }
