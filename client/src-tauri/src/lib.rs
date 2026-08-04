@@ -32,6 +32,11 @@ use tauri::Manager;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // 他のプラグインやアプリの初期化より先に二重起動を検知できるよう、
+        // single-instance プラグインを最初に登録する。
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            tray::show_main_window(app);
+        }))
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             setup_app_state(app)?;
