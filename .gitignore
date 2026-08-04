@@ -28,6 +28,9 @@ Thumbs.db
 # Claude Code
 .claude/
 
+# Codex
+.codex/
+
 # Tauri
 client/src-tauri/gen/
 
