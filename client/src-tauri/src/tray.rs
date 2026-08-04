@@ -7,10 +7,10 @@ use crate::state::RunInBackground;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, AppHandle, Manager};
 
-/// Show the existing main window and bring it to the foreground.
+/// 既存のメインウィンドウを表示し、前面へ移動する。
 ///
-/// This is shared by tray clicks and second-launch notifications so a hidden
-/// or minimized window behaves the same in both cases.
+/// トレイクリックと二重起動通知でこの処理を共有し、非表示または
+/// 最小化されている場合も同じように復元する。
 pub fn show_main_window(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();

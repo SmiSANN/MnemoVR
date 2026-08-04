@@ -28,7 +28,7 @@ Thumbs.db
 # Claude Code
 .claude/
 
-# Codex
+# Codex のローカル設定
 .codex/
 
 # Tauri
