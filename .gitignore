@@ -28,6 +28,9 @@ Thumbs.db
 # Claude Code
 .claude/
 
+# Codex のローカル設定
+.codex/
+
 # Tauri
 client/src-tauri/gen/
 
