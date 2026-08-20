@@ -105,7 +105,7 @@ export function WorldsView() {
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-4 shrink-0">
-        <h2 className="text-xl font-semibold text-white">{strings.worlds.title}</h2>
+        <h2 className="text-xl font-semibold text-app-primary">{strings.worlds.title}</h2>
         <select
           value={sortKey}
           onChange={(e) => setSortKey(e.target.value as SortKey)}
@@ -218,7 +218,7 @@ function WorldAccordion({
         ) : (
           <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
         )}
-        <span className="flex-1 text-left text-sm text-white truncate">
+        <span className="flex-1 text-left text-sm text-app-primary truncate">
           {group.worldName}
         </span>
         <span className="text-xs text-slate-300 bg-slate-700 px-2 py-0.5 rounded-full shrink-0">

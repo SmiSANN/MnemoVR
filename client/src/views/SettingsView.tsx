@@ -1,5 +1,16 @@
-import { useState, useEffect } from "react";
-import { RefreshCw, Trash2, FolderOpen, Image, LogIn, LogOut, Wallpaper, FolderSearch } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Check,
+  FolderOpen,
+  FolderSearch,
+  Image,
+  LogIn,
+  LogOut,
+  Palette,
+  RefreshCw,
+  Trash2,
+  Wallpaper,
+} from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
 import {
   scanLocalPhotos,
@@ -20,12 +31,46 @@ import { useOAuthLogin } from "../hooks/useOAuthLogin";
 import { clearThumbCache } from "../lib/thumbCache";
 import { strings } from "../lib/strings";
 import { AboutSection } from "../components/AboutSection";
+import type { ThemePreference } from "../lib/theme";
+
+const themeOptions: {
+  value: ThemePreference;
+  label: string;
+  preview: string;
+}[] = [
+  {
+    value: "default",
+    label: strings.settings.themeDefault,
+    preview: "linear-gradient(135deg, #0C1421 0 52%, #142032 52% 78%, #00C8F0 78%)",
+  },
+  {
+    value: "black",
+    label: strings.settings.themeBlack,
+    preview: "linear-gradient(135deg, #000000 0 52%, #111214 52% 78%, #00C8F0 78%)",
+  },
+  {
+    value: "white",
+    label: strings.settings.themeWhite,
+    preview: "linear-gradient(135deg, #F2F3F5 0 52%, #FFFFFF 52% 78%, #66737D 78%)",
+  },
+  {
+    value: "blue",
+    label: strings.settings.themeBlue,
+    preview: "linear-gradient(135deg, #EFF7FA 0 52%, #C8D6DD 52% 78%, #24718A 78%)",
+  },
+  {
+    value: "pink",
+    label: strings.settings.themePink,
+    preview: "linear-gradient(135deg, #F8F1F5 0 52%, #D8CED4 52% 78%, #A8446B 78%)",
+  },
+];
 
 export function SettingsView() {
   return (
     <div className="max-w-2xl">
-      <h2 className="text-xl font-semibold text-white mb-6">{strings.settings.title}</h2>
+      <h2 className="text-xl font-semibold text-app-primary mb-6">{strings.settings.title}</h2>
 
+      <ThemeSection />
       <FolderSection />
       <DataSection />
       <CacheSection />
@@ -35,6 +80,102 @@ export function SettingsView() {
       <WindowSection />
       <AboutSection />
     </div>
+  );
+}
+
+// ─── テーマ ──────────────────────────────────────────────────────
+
+function ThemeSection() {
+  const { theme, setTheme, addAlert, removeAlert } = useAppStore();
+  const pendingThemeRef = useRef<ThemePreference | null>(null);
+  const isSavingThemeRef = useRef(false);
+  const lastSavedThemeRef = useRef(theme);
+
+  useEffect(() => {
+    if (!isSavingThemeRef.current && pendingThemeRef.current === null) {
+      lastSavedThemeRef.current = theme;
+    }
+  }, [theme]);
+
+  function handleThemeChange(nextTheme: ThemePreference) {
+    if (nextTheme === theme) return;
+
+    setTheme(nextTheme);
+    pendingThemeRef.current = nextTheme;
+    void savePendingTheme();
+  }
+
+  async function savePendingTheme() {
+    if (isSavingThemeRef.current) return;
+    isSavingThemeRef.current = true;
+
+    while (pendingThemeRef.current !== null) {
+      const themeToSave = pendingThemeRef.current;
+      pendingThemeRef.current = null;
+      try {
+        await setSetting("theme", themeToSave);
+        lastSavedThemeRef.current = themeToSave;
+        removeAlert("theme-save-error");
+      } catch (e) {
+        if (
+          pendingThemeRef.current === null &&
+          useAppStore.getState().theme === themeToSave
+        ) {
+          setTheme(lastSavedThemeRef.current);
+        }
+        removeAlert("theme-save-error");
+        addAlert({
+          id: "theme-save-error",
+          type: "error",
+          message: `${strings.settings.themeSaveFailed}${e}`,
+        });
+      }
+    }
+
+    isSavingThemeRef.current = false;
+  }
+
+  return (
+    <SettingsSection title={strings.settings.themeTitle} icon={<Palette className="w-4 h-4" />}>
+      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={strings.settings.themeTitle}>
+        {themeOptions.map((option) => {
+          const selected = theme === option.value;
+          return (
+            <label
+              key={option.value}
+              title={option.label}
+              className="group flex w-24 cursor-pointer flex-col items-center gap-1.5 rounded-lg p-1"
+            >
+              <input
+                type="radio"
+                name="theme"
+                value={option.value}
+                checked={selected}
+                onChange={() => handleThemeChange(option.value)}
+                className="peer sr-only"
+              />
+              <span
+                className={`relative block h-12 w-12 rounded-lg border-2 transition-transform group-hover:scale-105 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-teal-400 ${
+                  selected
+                    ? "border-teal-400 ring-2 ring-teal-400/35 ring-offset-2 ring-offset-slate-800"
+                    : "border-slate-600"
+                }`}
+                style={{ background: option.preview }}
+              >
+                {selected && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-teal-600 text-white">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                  </span>
+                )}
+              </span>
+              <span className={`text-xs ${selected ? "font-medium text-teal-400" : "text-slate-300"}`}>
+                {option.label}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    </SettingsSection>
   );
 }
 
@@ -79,7 +220,7 @@ function FolderSection() {
             onChange={(e) => setInputPath(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && applyPath(inputPath)}
             placeholder="C:\Users\xxx\Pictures\VRChat"
-            className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-400"
+            className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm text-app-primary placeholder-slate-500 focus:outline-none focus:border-teal-400"
           />
         </div>
         <button
@@ -218,7 +359,7 @@ function AccountSection() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white">{authStatus.display_name}</p>
+              <p className="text-sm text-app-primary">{authStatus.display_name}</p>
               <p className="text-xs text-slate-300">{strings.settings.loggedInWith}</p>
             </div>
             <button
@@ -295,7 +436,7 @@ function BackgroundSection() {
             onChange={(e) => setInputPath(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && applyImage(inputPath)}
             placeholder="C:\Users\xxx\Pictures\background.png"
-            className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 pr-8 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-400"
+            className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 pr-8 text-sm text-app-primary placeholder-slate-500 focus:outline-none focus:border-teal-400"
           />
           {inputPath && (
             <button
@@ -412,7 +553,7 @@ function WindowSection() {
         <span className="text-sm text-slate-200">{strings.settings.backgroundToggleLabel}</span>
       </label>
       {autostartOn && (
-        <p className="text-xs text-teal-400/70 mt-1">{strings.settings.backgroundToggleForcedHint}</p>
+        <p className="text-xs text-teal-400 mt-1">{strings.settings.backgroundToggleForcedHint}</p>
       )}
       <p className="text-xs text-slate-300 mt-2">{strings.settings.backgroundToggleHint}</p>
     </SettingsSection>

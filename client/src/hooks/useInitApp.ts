@@ -13,6 +13,7 @@ import {
 } from "../api";
 import { useAppStore } from "../store/useAppStore";
 import { strings } from "../lib/strings";
+import { DEFAULT_THEME, isThemePreference } from "../lib/theme";
 
 interface UseInitAppResult {
   /**
@@ -36,7 +37,18 @@ interface UseInitAppResult {
  */
 export function useInitApp(): UseInitAppResult {
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
-  const { setPhotos, setPicturePath, setAuthStatus, setIsScanning, addAlert, setBackgroundImage, setBackgroundDataUrl, setShowAutoStartDialog, setAutostartOn } = useAppStore();
+  const {
+    setPhotos,
+    setPicturePath,
+    setAuthStatus,
+    setIsScanning,
+    addAlert,
+    setBackgroundImage,
+    setBackgroundDataUrl,
+    setShowAutoStartDialog,
+    setAutostartOn,
+    setTheme,
+  } = useAppStore();
 
   useEffect(() => {
     void init();
@@ -45,6 +57,14 @@ export function useInitApp(): UseInitAppResult {
   }, []);
 
   async function init() {
+    // SQLite を正としてテーマを復元。初回描画までは localStorage キャッシュを使用する。
+    try {
+      const savedTheme = await getSetting("theme");
+      setTheme(isThemePreference(savedTheme) ? savedTheme : DEFAULT_THEME);
+    } catch {
+      // 一時的にDBを読めない場合は、起動前に適用したキャッシュを維持する。
+    }
+
     // 1. 利用規約への同意確認（未同意ならオンボーディングを表示）
     const termsAgreed = await getSetting("terms_agreed").catch(() => null);
     setShowOnboarding(termsAgreed !== "1");
