@@ -30,7 +30,7 @@ export function FavoritesView() {
 
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-xl font-semibold text-white mb-4">
+      <h2 className="text-xl font-semibold text-app-primary mb-4">
         {strings.favorites.title}
         <span className="text-sm text-slate-300 ml-2">
           {favorites.length}枚

@@ -9,6 +9,8 @@
   --color-slate-500: #7A8FA0;
   --color-slate-400: #A0B4C4;
   --color-slate-300: #C0D0E0;
+  --color-slate-200: #E2E8F0;
+  --color-slate-100: #F1F5F9;
 
   /* シアン寄りティール（VRChatアクセント） */
   --color-teal-600: #055060;
@@ -21,25 +23,216 @@
   --color-discord-hover: #4752C4;
 }
 
+@utility text-app-primary {
+  color: var(--app-content-primary);
+}
+
 :root {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+
+  --app-content-primary: #FFFFFF;
+  --app-grid-line: rgba(0, 200, 240, 0.045);
+  --app-main-overlay: rgba(12, 20, 33, 0.70);
+  --app-sidebar-overlay: rgba(20, 32, 50, 0.80);
+  --app-surface-overlay: rgba(20, 32, 50, 0.85);
+  --app-header-gradient: linear-gradient(to right, #142032, rgba(5, 80, 96, 0.1));
+  --app-scrollbar-track: #142032;
+  --app-scrollbar-thumb: #284059;
+  --app-scrollbar-thumb-hover: #3A5570;
+  --calendar-heat-r-base: 0;
+  --calendar-heat-r-range: 60;
+  --calendar-heat-g-base: 180;
+  --calendar-heat-g-range: 50;
+  --calendar-heat-b-base: 240;
+  --calendar-heat-b-range: 0;
+  --calendar-heat-day: #E2E8F0;
+  --calendar-heat-count: #60E0F8;
+  --calendar-heat-strong-day: #0C1421;
+  --calendar-heat-strong-count: #1C2D42;
+  --rank-gold: #FACC15;
+  --rank-silver: #E2E8F0;
+  --rank-bronze: #D97706;
+  --warning-icon: #FACC15;
+}
+
+/* 白基調（Discordのライトテーマに近いニュートラル配色） */
+:root[data-theme="white"] {
+  --app-content-primary: #1E1F22;
+  --color-slate-900: #F2F3F5;
+  --color-slate-800: #FFFFFF;
+  --color-slate-700: #E3E5E8;
+  --color-slate-600: #B5BAC1;
+  --color-slate-500: #6D6F78;
+  --color-slate-400: #5C6068;
+  --color-slate-300: #4E5058;
+  --color-slate-200: #313338;
+  --color-slate-100: #1E1F22;
+  --color-teal-950: #0C3944;
+  --color-teal-900: #134E5B;
+  --color-teal-600: #00677C;
+  --color-teal-500: #007A91;
+  --color-teal-400: #00677C;
+  --color-teal-300: #075A6B;
+  --color-teal-200: #164E63;
+  --app-grid-line: rgba(0, 103, 124, 0.055);
+  --app-main-overlay: rgba(242, 243, 245, 0.78);
+  --app-sidebar-overlay: rgba(255, 255, 255, 0.88);
+  --app-surface-overlay: rgba(255, 255, 255, 0.90);
+  --app-header-gradient: linear-gradient(to right, #FFFFFF, rgba(0, 103, 124, 0.08));
+  --app-scrollbar-track: #E3E5E8;
+  --app-scrollbar-thumb: #AEB4BC;
+  --app-scrollbar-thumb-hover: #8E969F;
+  --calendar-heat-r-base: 0;
+  --calendar-heat-r-range: 25;
+  --calendar-heat-g-base: 122;
+  --calendar-heat-g-range: 20;
+  --calendar-heat-b-base: 145;
+  --calendar-heat-b-range: 25;
+  --calendar-heat-day: #313338;
+  --calendar-heat-count: #313338;
+  --calendar-heat-strong-day: #111827;
+  --calendar-heat-strong-count: #111827;
+}
+
+/* 黒基調（現行のネイビーよりさらに無彩色・高コントラスト） */
+:root[data-theme="black"] {
+  --app-content-primary: #FFFFFF;
+  --color-slate-900: #000000;
+  --color-slate-800: #101113;
+  --color-slate-700: #1C1E21;
+  --color-slate-600: #34373C;
+  --color-slate-500: #7F8791;
+  --color-slate-400: #A6AFBA;
+  --color-slate-300: #CAD1DA;
+  --color-slate-200: #E4E8ED;
+  --color-slate-100: #F5F7FA;
+  --app-grid-line: rgba(0, 200, 240, 0.055);
+  --app-main-overlay: rgba(0, 0, 0, 0.76);
+  --app-sidebar-overlay: rgba(16, 17, 19, 0.88);
+  --app-surface-overlay: rgba(16, 17, 19, 0.90);
+  --app-header-gradient: linear-gradient(to right, #101113, rgba(0, 200, 240, 0.07));
+  --app-scrollbar-track: #101113;
+  --app-scrollbar-thumb: #34373C;
+  --app-scrollbar-thumb-hover: #50545B;
+  --calendar-heat-day: #FFFFFF;
+  --calendar-heat-count: #FFFFFF;
+  --calendar-heat-strong-day: #000000;
+  --calendar-heat-strong-count: #000000;
+}
+
+/* 淡いピンク＋グレー */
+:root[data-theme="pink"] {
+  --app-content-primary: #2D2228;
+  --color-slate-900: #F8F1F5;
+  --color-slate-800: #FFF9FC;
+  --color-slate-700: #EAE2E7;
+  --color-slate-600: #C9BDC5;
+  --color-slate-500: #71636C;
+  --color-slate-400: #675A62;
+  --color-slate-300: #554950;
+  --color-slate-200: #3F333A;
+  --color-slate-100: #2D2228;
+  --color-teal-950: #4B162B;
+  --color-teal-900: #742A49;
+  --color-teal-600: #A8446B;
+  --color-teal-500: #B6537A;
+  --color-teal-400: #923A5C;
+  --color-teal-300: #7D304D;
+  --color-teal-200: #6B2942;
+  --app-grid-line: rgba(168, 68, 107, 0.06);
+  --app-main-overlay: rgba(248, 241, 245, 0.80);
+  --app-sidebar-overlay: rgba(255, 249, 252, 0.89);
+  --app-surface-overlay: rgba(255, 249, 252, 0.91);
+  --app-header-gradient: linear-gradient(to right, #FFF9FC, rgba(168, 68, 107, 0.09));
+  --app-scrollbar-track: #EAE2E7;
+  --app-scrollbar-thumb: #B9AAB4;
+  --app-scrollbar-thumb-hover: #9D8B97;
+  --calendar-heat-r-base: 168;
+  --calendar-heat-r-range: 22;
+  --calendar-heat-g-base: 68;
+  --calendar-heat-g-range: 35;
+  --calendar-heat-b-base: 107;
+  --calendar-heat-b-range: 28;
+  --calendar-heat-day: #3F333A;
+  --calendar-heat-count: #3F333A;
+  --calendar-heat-strong-day: #2D2228;
+  --calendar-heat-strong-count: #2D2228;
+}
+
+/* 水色＋グレー */
+:root[data-theme="blue"] {
+  --app-content-primary: #1D2A30;
+  --color-slate-900: #EFF7FA;
+  --color-slate-800: #F9FCFD;
+  --color-slate-700: #DDE8ED;
+  --color-slate-600: #B9C9D1;
+  --color-slate-500: #586B75;
+  --color-slate-400: #586B75;
+  --color-slate-300: #465A64;
+  --color-slate-200: #2D3B42;
+  --color-slate-100: #1D2A30;
+  --color-teal-950: #123945;
+  --color-teal-900: #17485A;
+  --color-teal-600: #24718A;
+  --color-teal-500: #2B7C96;
+  --color-teal-400: #1F6076;
+  --color-teal-300: #1D5B70;
+  --color-teal-200: #17485A;
+  --app-grid-line: rgba(36, 113, 138, 0.06);
+  --app-main-overlay: rgba(239, 247, 250, 0.80);
+  --app-sidebar-overlay: rgba(249, 252, 253, 0.89);
+  --app-surface-overlay: rgba(249, 252, 253, 0.91);
+  --app-header-gradient: linear-gradient(to right, #F9FCFD, rgba(36, 113, 138, 0.09));
+  --app-scrollbar-track: #DDE8ED;
+  --app-scrollbar-thumb: #A9BBC4;
+  --app-scrollbar-thumb-hover: #899FA9;
+  --calendar-heat-r-base: 31;
+  --calendar-heat-r-range: 28;
+  --calendar-heat-g-base: 96;
+  --calendar-heat-g-range: 40;
+  --calendar-heat-b-base: 118;
+  --calendar-heat-b-range: 45;
+  --calendar-heat-day: #2D3B42;
+  --calendar-heat-count: #2D3B42;
+  --calendar-heat-strong-day: #1D2A30;
+  --calendar-heat-strong-count: #1D2A30;
+}
+
+/* 明るいテーマ向けのステータス色とDiscordボタン色 */
+:root[data-color-scheme="light"] {
+  --color-indigo-600: #4752C4;
+  --color-indigo-500: #5865F2;
+  --color-green-900: #DCFCE7;
+  --color-green-500: #15803D;
+  --color-green-200: #166534;
+  --color-yellow-900: #FEF3C7;
+  --color-yellow-500: #A16207;
+  --color-yellow-200: #854D0E;
+  --color-red-900: #FEE2E2;
+  --color-red-500: #B91C1C;
+  --color-red-200: #991B1B;
+  --rank-gold: #A16207;
+  --rank-silver: #475569;
+  --rank-bronze: #92400E;
+  --warning-icon: #A16207;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0C1421;
-  color: #e2e8f0;
+  background-color: var(--color-slate-900);
+  color: var(--color-slate-200);
   overflow: hidden;
   user-select: none;
 }
 
 /* VRChat風グリッドライン背景 */
 .bg-grid {
-  background-color: #0C1421;
+  background-color: var(--color-slate-900);
   background-image:
-    linear-gradient(rgba(0, 200, 240, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 200, 240, 0.045) 1px, transparent 1px);
+    linear-gradient(var(--app-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--app-grid-line) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -50,27 +243,45 @@ body {
 
 /* 背景画像時: UI カードを 15% 透過 */
 [data-has-bg] .bg-slate-800 {
-  background-color: rgba(20, 32, 50, 0.85);
+  background-color: var(--app-surface-overlay);
 }
 
-/* グロー系ユーティリティ */
-.glow-teal {
-  filter: drop-shadow(0 0 8px rgba(0, 200, 240, 0.7));
+.calendar-heat-day {
+  color: var(--calendar-heat-day);
 }
-.glow-teal-sm {
-  filter: drop-shadow(0 0 4px rgba(0, 200, 240, 0.5));
+.calendar-heat-count {
+  color: var(--calendar-heat-count);
+}
+.calendar-heat-strong-day {
+  color: var(--calendar-heat-strong-day);
+}
+.calendar-heat-strong-count {
+  color: var(--calendar-heat-strong-count);
+}
+
+.rank-gold {
+  color: var(--rank-gold);
+}
+.rank-silver {
+  color: var(--rank-silver);
+}
+.rank-bronze {
+  color: var(--rank-bronze);
+}
+.warning-icon {
+  color: var(--warning-icon);
 }
 
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #142032;
+  background: var(--app-scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #284059;
+  background: var(--app-scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A5570;
+  background: var(--app-scrollbar-thumb-hover);
 }

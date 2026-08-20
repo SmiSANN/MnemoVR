@@ -20,8 +20,8 @@ export function UploadWarningDialog({ onConfirm, onCancel }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 mb-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0" />
-          <h3 className="text-sm font-semibold text-white">{strings.uploadWarning.title}</h3>
+          <AlertTriangle className="w-5 h-5 warning-icon shrink-0" />
+          <h3 className="text-sm font-semibold text-app-primary">{strings.uploadWarning.title}</h3>
         </div>
 
         <p className="text-xs text-slate-200 leading-relaxed mb-4">

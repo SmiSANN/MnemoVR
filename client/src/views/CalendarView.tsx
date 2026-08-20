@@ -260,7 +260,7 @@ function CalendarNavHeader({
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-xl font-semibold text-white min-w-32 text-center">
+        <h2 className="text-xl font-semibold text-app-primary min-w-32 text-center">
           {viewMode === "month" ? `${year}年 ${month + 1}月` : `${year}年`}
         </h2>
         <button
@@ -327,7 +327,7 @@ function ToggleButton({
     <button
       onClick={onClick}
       className={`px-4 py-1.5 text-sm ${
-        active ? "bg-teal-500 text-white" : "text-slate-300 hover:text-white"
+        active ? "bg-teal-500 text-white" : "text-slate-300 hover:text-app-primary"
       }`}
     >
       {label}
@@ -489,7 +489,7 @@ function SelectedDayPanel({
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-lg font-semibold text-app-primary">
           {formatSelectedDay(selectedDay)}
           <span className="text-sm text-slate-300 ml-2">{photoCount}枚</span>
         </h3>
@@ -531,11 +531,9 @@ function SelectedDayPanel({
 function heatColor(count: number, maxCount: number): string {
   if (count === 0) return "";
   const t = Math.min(count / maxCount, 1);
-  const r = Math.round(60 * Math.pow(t, 2));
-  const g = Math.round(180 + 50 * t);
-  const b = 240;
-  const a = 0.15 + t * 0.7;
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
+  const curve = Math.pow(t, 2);
+  const alpha = 0.15 + t * 0.7;
+  return `rgb(calc(var(--calendar-heat-r-base) + var(--calendar-heat-r-range) * ${curve}) calc(var(--calendar-heat-g-base) + var(--calendar-heat-g-range) * ${t}) calc(var(--calendar-heat-b-base) + var(--calendar-heat-b-range) * ${t}) / ${alpha})`;
 }
 
 function heatTextColors(count: number, maxCount: number): { day: string; count: string } {
@@ -545,15 +543,15 @@ function heatTextColors(count: number, maxCount: number): { day: string; count: 
   const g = 180 + 50 * t;
   const b = 240;
   const a = 0.15 + t * 0.7;
-  // ベース色 #0C1421 (12, 20, 33) と合成して知覚輝度を計算
-  const br = r * a + 12 * (1 - a);
-  const bg = g * a + 20 * (1 - a);
-  const bb = b * a + 33 * (1 - a);
-  const brightness = 0.299 * br + 0.587 * bg + 0.114 * bb;
+  // デフォルトテーマの従来の切替位置を保ち、実際の文字色はテーマ別トークンで決める。
+  const brightness =
+    0.299 * (r * a + 12 * (1 - a)) +
+    0.587 * (g * a + 20 * (1 - a)) +
+    0.114 * (b * a + 33 * (1 - a));
   if (brightness > 100) {
-    return { day: "text-slate-900", count: "text-slate-700" };
+    return { day: "calendar-heat-strong-day", count: "calendar-heat-strong-count" };
   }
-  return { day: "text-slate-200", count: "text-teal-300" };
+  return { day: "calendar-heat-day", count: "calendar-heat-count" };
 }
 
 function neighborDay(

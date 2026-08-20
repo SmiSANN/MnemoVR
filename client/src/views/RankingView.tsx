@@ -8,16 +8,16 @@ import { useOAuthLogin } from "../hooks/useOAuthLogin";
 import { strings } from "../lib/strings";
 
 const rankIcons = [
-  <Trophy className="w-5 h-5 text-yellow-400" />,
-  <Medal className="w-5 h-5 text-slate-200" />,
-  <Award className="w-5 h-5 text-amber-600" />,
+  <Trophy className="w-5 h-5 rank-gold" />,
+  <Medal className="w-5 h-5 rank-silver" />,
+  <Award className="w-5 h-5 rank-bronze" />,
 ];
 
 /** ランキング 1 カテゴリのカラム。 */
 function RankingColumn({ title, data }: { title: string; data: RankingEntry[] }) {
   return (
     <div className="bg-slate-800 rounded-xl p-4 flex-1 min-w-0 border border-teal-400/10">
-      <h3 className="text-sm font-semibold text-teal-400 mb-4 text-center glow-teal-sm">{title}</h3>
+      <h3 className="text-sm font-semibold text-teal-400 mb-4 text-center">{title}</h3>
       {data.length === 0 ? (
         <p className="text-center text-sm text-slate-300">{strings.ranking.noDataShort}</p>
       ) : (
@@ -43,7 +43,7 @@ function RankingRow({ item, index }: { item: RankingEntry; index: number }) {
       <span className="w-6 text-center">
         {isTop ? rankIcons[index] : <span className="text-xs text-slate-300">{index + 1}</span>}
       </span>
-      <span className={`flex-1 text-sm truncate ${isTop ? "text-white font-medium" : "text-slate-300"}`}>
+      <span className={`flex-1 text-sm truncate ${isTop ? "text-app-primary font-medium" : "text-slate-300"}`}>
         {item.world_name}
       </span>
       <span className="text-xs text-slate-300">{item.score}</span>
@@ -57,11 +57,11 @@ function LoginGate({ onLoggedIn }: { onLoggedIn: (auth: AuthStatus) => void }) {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white mb-4">{strings.ranking.title}</h2>
+      <h2 className="text-xl font-semibold text-app-primary mb-4">{strings.ranking.title}</h2>
       <div className="bg-slate-800 rounded-xl p-8 flex flex-col items-center gap-4 max-w-sm mx-auto mt-8">
         <Trophy className="w-10 h-10 text-teal-400 opacity-60" />
         <div className="text-center">
-          <p className="text-white font-medium mb-1">{strings.ranking.loginRequired}</p>
+          <p className="text-app-primary font-medium mb-1">{strings.ranking.loginRequired}</p>
           <p className="text-xs text-slate-300">{strings.ranking.loginDescription}</p>
         </div>
 
@@ -141,7 +141,7 @@ export function RankingView() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-white">{strings.ranking.title}</h2>
+        <h2 className="text-xl font-semibold text-app-primary">{strings.ranking.title}</h2>
         <button
           onClick={loadRankings}
           disabled={loading}

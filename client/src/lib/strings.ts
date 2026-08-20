@@ -36,6 +36,13 @@ export const strings = {
 
   settings: {
     title: '設定',
+    themeTitle: 'テーマ',
+    themeDefault: 'デフォルト',
+    themeWhite: 'ライト',
+    themeBlack: 'ダーク',
+    themePink: 'ピンク',
+    themeBlue: '水色',
+    themeSaveFailed: 'テーマの保存に失敗しました: ',
     folderTitle: 'VRChat画像フォルダ',
     folderHint: 'VRChatの写真が保存されているフォルダのパスを指定してください。デフォルト: ピクチャ\\VRChat',
     saveButton: '保存',

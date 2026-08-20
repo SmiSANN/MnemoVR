@@ -11,6 +11,7 @@ import { useAppStore } from "../store/useAppStore";
 import { useInitApp } from "../hooks/useInitApp";
 import { usePhotoEvents } from "../hooks/usePhotoEvents";
 import { useUpdateCheck } from "../hooks/useUpdateCheck";
+import { useTheme } from "../hooks/useTheme";
 import { AlertPanel } from "./AlertPanel";
 import { AutoStartDialog } from "./AutoStartDialog";
 import { FullScanOverlay } from "./FullScanOverlay";
@@ -34,6 +35,7 @@ export function AppShell() {
   const { isScanning, photos, backgroundDataUrl, showAutoStartDialog, setShowAutoStartDialog, setAutostartOn } = useAppStore();
   const { showOnboarding, setOnboardingDone } = useInitApp();
   const { newVersion, dismiss: dismissUpdate } = useUpdateCheck();
+  useTheme();
   usePhotoEvents();
 
   // 規約同意チェックが完了するまで何も描画しない（メニューの一瞬表示を防ぐ）
@@ -56,7 +58,7 @@ export function AppShell() {
       {/* main の背景色透明度で「どれだけ透かすか」を制御（固定 30%） */}
       <main
         className="flex-1 flex flex-col overflow-hidden bg-grid relative z-10"
-        style={backgroundDataUrl ? { backgroundColor: "rgba(12, 20, 33, 0.70)" } : undefined}
+        style={backgroundDataUrl ? { backgroundColor: "var(--app-main-overlay)" } : undefined}
       >
         <AlertPanel />
         <div className="flex-1 overflow-auto p-6">
@@ -100,14 +102,14 @@ function Sidebar() {
   return (
     <aside
       className="w-56 bg-slate-800 flex flex-col shrink-0 border-r border-slate-600/40 relative z-10"
-      style={backgroundDataUrl ? { backgroundColor: "rgba(20, 32, 50, 0.80)" } : undefined}
+      style={backgroundDataUrl ? { backgroundColor: "var(--app-sidebar-overlay)" } : undefined}
     >
       <div
         className="flex items-center gap-2 px-4 py-5 border-b border-slate-600/40"
-        style={backgroundDataUrl ? undefined : { background: "linear-gradient(to right, #142032, rgba(5,80,96,0.1))" }}
+        style={backgroundDataUrl ? undefined : { background: "var(--app-header-gradient)" }}
       >
-        <MnemoIcon className="w-6 h-6 text-teal-400 glow-teal" />
-        <h1 className="text-lg font-bold text-teal-400 glow-teal-sm tracking-wide">MnemoVR</h1>
+        <MnemoIcon className="w-6 h-6 text-teal-400" />
+        <h1 className="text-lg font-bold text-teal-400 tracking-wide">MnemoVR</h1>
       </div>
       <nav className="flex-1 py-3 px-2 flex flex-col">
         <div className="flex flex-col gap-2">
@@ -118,7 +120,7 @@ function Sidebar() {
               className={({ isActive }) =>
                 `group flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition-colors ${
                   isActive
-                    ? "bg-teal-400/10 text-teal-300 border-teal-400/50 glow-teal-sm"
+                    ? "bg-teal-400/10 text-teal-300 border-teal-400/50"
                     : "bg-teal-950/20 text-teal-200/90 border-teal-400/20 hover:border-teal-400/35 hover:bg-teal-900/15"
                 }`
               }
@@ -139,7 +141,7 @@ function Sidebar() {
               className={({ isActive }) =>
                 `group flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition-colors ${
                   isActive
-                    ? "bg-teal-400/10 text-teal-300 border-teal-400/50 glow-teal-sm"
+                    ? "bg-teal-400/10 text-teal-300 border-teal-400/50"
                     : "bg-teal-950/20 text-teal-200/90 border-teal-400/20 hover:border-teal-400/35 hover:bg-teal-900/15"
                 }`
               }

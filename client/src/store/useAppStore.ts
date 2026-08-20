@@ -3,6 +3,11 @@ import { toggleFavoriteDb } from "../api";
 import type { AuthStatus } from "../api/auth";
 import type { PhotoRecord, AlertMessage } from "../types";
 import { strings } from "../lib/strings";
+import {
+  cacheThemePreference,
+  getCachedThemePreference,
+  type ThemePreference,
+} from "../lib/theme";
 
 export type { PhotoRecord, AlertMessage };
 
@@ -39,6 +44,9 @@ interface AppState {
   setBackgroundImage: (path: string) => void;
   backgroundDataUrl: string;
   setBackgroundDataUrl: (url: string) => void;
+
+  theme: ThemePreference;
+  setTheme: (theme: ThemePreference) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -110,4 +118,10 @@ export const useAppStore = create<AppState>((set) => ({
   setBackgroundImage: (path) => set({ backgroundImage: path }),
   backgroundDataUrl: "",
   setBackgroundDataUrl: (url) => set({ backgroundDataUrl: url }),
+
+  theme: getCachedThemePreference(),
+  setTheme: (theme) => {
+    cacheThemePreference(theme);
+    set({ theme });
+  },
 }));

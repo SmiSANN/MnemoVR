@@ -28,7 +28,7 @@ export function OnboardingOverlay({ onComplete }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-slate-900/95 flex items-center justify-center">
       <div className="w-full max-w-lg mx-4">
         {step === "terms" ? (
           <TermsStep
@@ -60,7 +60,7 @@ function AutoStartStep({ onNext }: { onNext: () => void }) {
     <div className="bg-slate-800 rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-4">
         <Rocket className="w-6 h-6 text-teal-400 shrink-0" />
-        <h2 className="text-lg font-semibold text-white">{strings.autoStartDialog.title}</h2>
+        <h2 className="text-lg font-semibold text-app-primary">{strings.autoStartDialog.title}</h2>
       </div>
       <p className="text-sm text-slate-300 mb-6">{strings.autoStartDialog.message}</p>
       <div className="flex gap-3">
@@ -72,7 +72,7 @@ function AutoStartStep({ onNext }: { onNext: () => void }) {
         </button>
         <button
           onClick={() => handle(false)}
-          className="px-4 py-2 text-sm text-slate-100 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm text-slate-100 hover:text-app-primary hover:bg-slate-700 rounded-lg transition-colors"
         >
           {strings.autoStartDialog.skip}
         </button>
@@ -92,7 +92,7 @@ function TermsStep({
 }) {
   return (
     <div className="bg-slate-800 rounded-2xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-4">{strings.onboarding.termsTitle}</h2>
+      <h2 className="text-lg font-semibold text-app-primary mb-4">{strings.onboarding.termsTitle}</h2>
 
       <div className="bg-slate-900 rounded-lg p-4 h-56 overflow-y-auto text-xs text-slate-300 leading-relaxed mb-4">
         <TermsContent />
@@ -135,7 +135,7 @@ function LoginStep({
 
   return (
     <div className="bg-slate-800 rounded-2xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-1">{strings.onboarding.loginTitle}</h2>
+      <h2 className="text-lg font-semibold text-app-primary mb-1">{strings.onboarding.loginTitle}</h2>
       <p className="text-xs text-slate-300 mb-5">{strings.onboarding.loginDescription}</p>
 
       {loginError && (
