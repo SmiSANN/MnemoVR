@@ -19,7 +19,9 @@ import { OnboardingOverlay } from "./OnboardingOverlay";
 import { UpdateDialog } from "./UpdateDialog";
 import { strings } from "../lib/strings";
 import { setAutostartEnabled, setRunInBackground, setSetting } from "../api";
-import mnemoIconUrl from "../../src-tauri/icons/mnemo_vr_icon_v10_colored.svg";
+import mnemoIconSvg from "../../src-tauri/icons/mnemo_vr_icon_v10_colored.svg?raw";
+
+const themedMnemoIconSvg = mnemoIconSvg.replaceAll("rgb(0,200,240)", "currentColor");
 
 const mainNavItems = [
   { to: "/ranking", icon: Trophy, label: strings.nav.ranking },
@@ -108,7 +110,11 @@ function Sidebar() {
         className="flex items-center gap-2 px-4 py-5 border-b border-slate-600/40"
         style={backgroundDataUrl ? undefined : { background: "var(--app-header-gradient)" }}
       >
-        <img src={mnemoIconUrl} alt="" aria-hidden="true" className="w-6 h-6" />
+        <span
+          aria-hidden="true"
+          className="inline-block w-6 h-6 shrink-0 text-teal-400 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
+          dangerouslySetInnerHTML={{ __html: themedMnemoIconSvg }}
+        />
         <h1 className="text-lg font-bold text-teal-400 tracking-wide">MnemoVR</h1>
       </div>
       <nav className="flex-1 py-3 px-2 flex flex-col">
