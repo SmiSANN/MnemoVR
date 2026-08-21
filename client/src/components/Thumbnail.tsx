@@ -40,7 +40,7 @@ export function Thumbnail({ filePath, className, onClick }: ThumbnailProps) {
   }, [filePath, src]);
 
   return (
-    <div ref={ref} className={`bg-black ${className ?? ""}`} onClick={onClick}>
+    <div ref={ref} className={`bg-slate-700 ${className ?? ""}`} onClick={onClick}>
       {src ? (
         <img
           src={src}
