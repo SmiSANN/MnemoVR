@@ -243,7 +243,7 @@ wrangler d1 execute mnemovr-db --command "ALTER TABLE users ADD COLUMN is_banned
 | 種別 | 場所 | 内容 |
 |---|---|---|
 | フロントメモリ | React state | サムネイル URL (`thumbCache`) |
-| ローカルファイル | `thumbnails/` ディレクトリ | サムネイル JPEG |
+| ローカルファイル | `thumbnails/` ディレクトリ | 透過サムネイル WebP |
 | ローカル DB | `image_url_cache` | アップロード済み画像 URL (3 日 TTL) |
 | サーバー DB | `worlds.updated_at` | ワールド名 (3 日 TTL) |
 
