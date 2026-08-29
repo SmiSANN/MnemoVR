@@ -218,31 +218,33 @@ function MetadataBar({
 
   return (
     <div
-      className="bg-slate-800/95 border-t border-teal-400/10 px-6 py-3 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-slate-200"
+      className="bg-slate-800/95 border-t border-teal-400/10 px-6 py-3 flex items-center gap-4 text-sm text-slate-200"
       onClick={(e) => e.stopPropagation()}
     >
-      <span className="text-slate-300 text-xs truncate max-w-md">{photo.file_path}</span>
-      <span>{dateStr}</span>
-      {photo.world_id && (
-        <a
-          href={`https://vrchat.com/home/world/${photo.world_id}`}
-          onClick={(e) => handleLink(e, `https://vrchat.com/home/world/${photo.world_id}`)}
-          className="flex items-center gap-1 text-teal-400 hover:underline cursor-pointer"
-        >
-          {photo.world_name || photo.world_id}
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      )}
-      {photo.user_id && (
-        <a
-          href={`https://vrchat.com/home/user/${photo.user_id}`}
-          onClick={(e) => handleLink(e, `https://vrchat.com/home/user/${photo.user_id}`)}
-          className="flex items-center gap-1 text-teal-400 hover:underline cursor-pointer"
-        >
-          {photo.user_name || photo.user_id}
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      )}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-1">
+        <span className="text-slate-300 text-xs truncate max-w-md">{photo.file_path}</span>
+        <span>{dateStr}</span>
+        {photo.world_id && (
+          <a
+            href={`https://vrchat.com/home/world/${photo.world_id}`}
+            onClick={(e) => handleLink(e, `https://vrchat.com/home/world/${photo.world_id}`)}
+            className="flex items-center gap-1 text-teal-400 hover:underline cursor-pointer"
+          >
+            {photo.world_name || photo.world_id}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+        {photo.user_id && (
+          <a
+            href={`https://vrchat.com/home/user/${photo.user_id}`}
+            onClick={(e) => handleLink(e, `https://vrchat.com/home/user/${photo.user_id}`)}
+            className="flex items-center gap-1 text-teal-400 hover:underline cursor-pointer"
+          >
+            {photo.user_name || photo.user_id}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+      </div>
 
       <UploadButton status={uploadStatus} onClick={onUploadClick} />
     </div>
@@ -267,7 +269,7 @@ function UploadButton({
     <button
       onClick={onClick}
       disabled={status === "uploading"}
-      className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${colorClass}`}
+      className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${colorClass}`}
     >
       {status === "uploading" ? (
         <Loader2 className="w-3.5 h-3.5 animate-spin" />
