@@ -14,7 +14,7 @@
         "title": "MnemoVR - VRChat Photo Album",
         "width": 1280,
         "height": 800,
-        "minWidth": 900,
+        "minWidth": 600,
         "minHeight": 600
       }
     ],
