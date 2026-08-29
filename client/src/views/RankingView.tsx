@@ -13,6 +13,60 @@ const rankIcons = [
   <Award className="w-5 h-5 rank-bronze" />,
 ];
 
+// 宣材撮影用: 本番ランキングAPIにはアクセスせず、画面表示のみをデモデータにする。
+const USE_PROMOTIONAL_RANKINGS = true;
+
+const promotionalRankings: RankingsData = {
+  all_time: [
+    ["Luminous Library", 186],
+    ["Japan Shrine", 172],
+    ["Midnight Rooftop", 159],
+    ["A Sign of Life", 148],
+    ["Fujiiya", 135],
+    ["Pop Escape", 121],
+    ["The Black Cat", 118],
+    ["Moonlit Garden", 105],
+    ["After the Rain", 97],
+    ["星降る展望台", 91],
+  ].map(([world_name, score], index) => ({
+    world_id: `wrld_demo_all_time_${index + 1}`,
+    world_name: String(world_name),
+    score: Number(score),
+  })),
+  weekly: [
+    ["Luminous Library", 42],
+    ["Neon City Nights", 38],
+    ["月見の宿", 34],
+    ["The Great Pug", 31],
+    ["Silent Hill", 27],
+    ["Virtual Market Plaza", 24],
+    ["雨音カフェ", 21],
+    ["Reflection", 19],
+    ["Cozy Apartment", 16],
+    ["Starlight Theater", 14],
+  ].map(([world_name, score], index) => ({
+    world_id: `wrld_demo_weekly_${index + 1}`,
+    world_name: String(world_name),
+    score: Number(score),
+  })),
+  daily: [
+    ["Neon City Nights", 18],
+    ["Luminous Library", 16],
+    ["Sunset Beach", 14],
+    ["喫茶まどろみ", 12],
+    ["The Black Cat", 11],
+    ["Moonlit Garden", 9],
+    ["世界の果ての駅", 8],
+    ["After the Rain", 7],
+    ["Cozy Apartment", 6],
+    ["星降る展望台", 5],
+  ].map(([world_name, score], index) => ({
+    world_id: `wrld_demo_daily_${index + 1}`,
+    world_name: String(world_name),
+    score: Number(score),
+  })),
+};
+
 /** ランキング 1 カテゴリのカラム。 */
 function RankingColumn({ title, data }: { title: string; data: RankingEntry[] }) {
   return (
@@ -112,7 +166,7 @@ export function RankingView() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchRankings();
+      const data = USE_PROMOTIONAL_RANKINGS ? promotionalRankings : await fetchRankings();
       setRankings(data);
     } catch (e) {
       setError(`${strings.ranking.fetchFailed}${e}`);
