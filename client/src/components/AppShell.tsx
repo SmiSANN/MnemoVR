@@ -101,7 +101,7 @@ function Sidebar() {
   const { backgroundDataUrl } = useAppStore();
   return (
     <aside
-      className="w-56 bg-slate-800 flex flex-col shrink-0 border-r border-slate-600/40 relative z-10"
+      className="hidden w-56 bg-slate-800 flex-col shrink-0 border-r border-slate-600/40 relative z-10 md:flex"
       style={backgroundDataUrl ? { backgroundColor: "var(--app-sidebar-overlay)" } : undefined}
     >
       <div
