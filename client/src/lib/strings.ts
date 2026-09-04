@@ -112,6 +112,7 @@ export const strings = {
 
   calendar: {
     today: '今日',
+    closeDay: '閉じる',
   },
 
   store: {

@@ -5,12 +5,10 @@ import { getThumbCacheEntry, setThumbCacheEntry } from "../lib/thumbCache";
 interface ThumbnailProps {
   filePath: string;
   className?: string;
-  /** 画像のフィット方法。既定は contain（全体表示）。cover は枠いっぱいに切り抜き表示。 */
-  fit?: "contain" | "cover";
   onClick?: () => void;
 }
 
-export function Thumbnail({ filePath, className, fit = "contain", onClick }: ThumbnailProps) {
+export function Thumbnail({ filePath, className, onClick }: ThumbnailProps) {
   const [src, setSrc] = useState<string | null>(getThumbCacheEntry(filePath) ?? null);
   const ref = useRef<HTMLDivElement>(null);
   const requested = useRef(false);
@@ -47,7 +45,7 @@ export function Thumbnail({ filePath, className, fit = "contain", onClick }: Thu
         <img
           src={src}
           alt=""
-          className={`w-full h-full ${fit === "cover" ? "object-cover" : "object-contain"}`}
+          className="w-full h-full object-contain"
           decoding="async"
         />
       ) : (

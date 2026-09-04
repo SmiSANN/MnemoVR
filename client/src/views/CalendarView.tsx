@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
 import { useAppStore, type PhotoRecord } from "../store/useAppStore";
 import { strings } from "../lib/strings";
@@ -110,6 +110,16 @@ export function CalendarView() {
     setCurrentDate(new Date(y, m - 1, 1));
   }
 
+  // Esc で日別パネルを閉じる。ライトボックス表示中は Lightbox 側の Esc を優先する。
+  useEffect(() => {
+    if (!selectedDay || lightboxIdx !== null) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSelectedDay(null);
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedDay, lightboxIdx]);
+
   function handleSelectDay(dateKey: string) {
     setSelectedDay(dateKey);
     setLightboxIdx(null);
@@ -127,7 +137,7 @@ export function CalendarView() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="relative h-full flex flex-col">
       <CalendarNavHeader
         viewMode={viewMode}
         year={year}
@@ -207,6 +217,7 @@ export function CalendarView() {
           tileRows={tileRows}
           onNavigateDay={(d) => navigateToDay(d)}
           onOpenLightbox={setLightboxIdx}
+          onClose={() => setSelectedDay(null)}
         />
       )}
 
@@ -463,8 +474,7 @@ function MonthGrid({
               <Thumbnail
                 key={latestPhoto.id}
                 filePath={latestPhoto.file_path}
-                fit="cover"
-                className="mt-0.5 flex-1 min-h-0 w-full rounded-[3px] overflow-hidden bg-black/20"
+                className="mt-0.5 flex-1 min-h-0 w-full rounded-[3px] overflow-hidden"
               />
             )}
           </>
@@ -504,6 +514,7 @@ function SelectedDayPanel({
   tileRows,
   onNavigateDay,
   onOpenLightbox,
+  onClose,
 }: {
   selectedDay: string;
   photoCount: number;
@@ -512,49 +523,62 @@ function SelectedDayPanel({
   tileRows: { startIndex: number; items: PhotoRecord[] }[];
   onNavigateDay: (dateKey: string) => void;
   onOpenLightbox: (idx: number) => void;
+  onClose: () => void;
 }) {
   return (
-    <div className="mt-4 flex-1 flex flex-col min-h-0">
-      <div className="flex items-center gap-2 mb-2 shrink-0">
-        <button
-          onClick={() => prevPhotoDay && onNavigateDay(prevPhotoDay)}
-          disabled={!prevPhotoDay}
-          className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <h3 className="text-lg font-semibold text-app-primary">
-          {formatSelectedDay(selectedDay)}
-          <span className="text-sm text-slate-300 ml-2">{photoCount}枚</span>
-        </h3>
-        <button
-          onClick={() => nextPhotoDay && onNavigateDay(nextPhotoDay)}
-          disabled={!nextPhotoDay}
-          className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-      <div className="flex-1">
-        <Virtuoso
-          totalCount={tileRows.length}
-          fixedItemHeight={ROW_HEIGHT}
-          itemContent={(rowIndex) => {
-            const row = tileRows[rowIndex];
-            return (
-              <div className="flex gap-2 pb-2">
-                {row.items.map((p, i) => (
-                  <Thumbnail
-                    key={p.id}
-                    filePath={p.file_path}
-                    className="w-[130px] h-[130px] shrink-0 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-teal-400"
-                    onClick={() => onOpenLightbox(row.startIndex + i)}
-                  />
-                ))}
-              </div>
-            );
-          }}
-        />
+    // カレンダーの上に重ねる。ライトボックス（z-50）より下のレイヤー。
+    <div className="absolute inset-0 z-40 flex flex-col">
+      <div className="absolute inset-0 bg-slate-900/70" onClick={onClose} />
+      <div className="relative flex-1 min-h-0 flex flex-col bg-slate-800 rounded-xl p-4 border border-slate-600/30 shadow-2xl">
+        <div className="flex items-center gap-2 mb-2 shrink-0">
+          <button
+            onClick={() => prevPhotoDay && onNavigateDay(prevPhotoDay)}
+            disabled={!prevPhotoDay}
+            className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h3 className="text-lg font-semibold text-app-primary">
+            {formatSelectedDay(selectedDay)}
+            <span className="text-sm text-slate-300 ml-2">{photoCount}枚</span>
+          </h3>
+          <button
+            onClick={() => nextPhotoDay && onNavigateDay(nextPhotoDay)}
+            disabled={!nextPhotoDay}
+            className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+          <button
+            onClick={onClose}
+            aria-label={strings.calendar.closeDay}
+            title={strings.calendar.closeDay}
+            className="ml-auto p-1 rounded hover:bg-slate-700"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="flex-1 min-h-0">
+          <Virtuoso
+            totalCount={tileRows.length}
+            fixedItemHeight={ROW_HEIGHT}
+            itemContent={(rowIndex) => {
+              const row = tileRows[rowIndex];
+              return (
+                <div className="flex gap-2 pb-2">
+                  {row.items.map((p, i) => (
+                    <Thumbnail
+                      key={p.id}
+                      filePath={p.file_path}
+                      className="w-[130px] h-[130px] shrink-0 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-teal-400"
+                      onClick={() => onOpenLightbox(row.startIndex + i)}
+                    />
+                  ))}
+                </div>
+              );
+            }}
+          />
+        </div>
       </div>
     </div>
   );
