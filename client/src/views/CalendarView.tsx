@@ -125,6 +125,9 @@ export function CalendarView() {
     setLightboxIdx(null);
   }
 
+  // 日別パネル（カレンダーの上に重なる島）を開いているか
+  const dayPanelOpen = viewMode === "month" && !!selectedDay && photosForDay.length > 0;
+
   function handleLightboxPrevBoundary() {
     if (!prevPhotoDay) return;
     const prevCount = photosByDate.get(prevPhotoDay) ?? 0;
@@ -180,18 +183,42 @@ export function CalendarView() {
         onViewModeChange={setViewMode}
       />
 
+      {dayPanelOpen && (
+        <div
+          className="absolute inset-0 z-20 bg-slate-900/60"
+          onClick={() => setSelectedDay(null)}
+        />
+      )}
+
       {viewMode === "month" ? (
-        <div className="bg-slate-800 rounded-xl p-4 shrink-0 border border-slate-600/30">
-          <MonthGrid
-            year={year}
-            month={month}
-            clickable
-            photosByDate={photosByDate}
-            latestPhotoByDate={latestPhotoByDate}
-            maxCount={maxCount}
-            selectedDay={selectedDay}
-            onSelect={handleSelectDay}
-          />
+        // カレンダーの島の上端・左右幅に日別パネルを揃えるための基準。
+        // 下方向はビュー下端まで伸ばしてよい。
+        <div className="relative flex-1 min-h-0 flex flex-col">
+          <div className="bg-slate-800 rounded-xl p-4 shrink-0 border border-slate-600/30">
+            <MonthGrid
+              year={year}
+              month={month}
+              clickable
+              photosByDate={photosByDate}
+              latestPhotoByDate={latestPhotoByDate}
+              maxCount={maxCount}
+              selectedDay={selectedDay}
+              onSelect={handleSelectDay}
+            />
+          </div>
+
+          {dayPanelOpen && selectedDay && (
+            <SelectedDayPanel
+              selectedDay={selectedDay}
+              photoCount={photosForDay.length}
+              prevPhotoDay={prevPhotoDay}
+              nextPhotoDay={nextPhotoDay}
+              tileRows={tileRows}
+              onNavigateDay={(d) => navigateToDay(d)}
+              onOpenLightbox={setLightboxIdx}
+              onClose={() => setSelectedDay(null)}
+            />
+          )}
         </div>
       ) : (
         <YearView
@@ -205,19 +232,6 @@ export function CalendarView() {
             setViewMode("month");
             setSelectedDay(null);
           }}
-        />
-      )}
-
-      {viewMode === "month" && selectedDay && photosForDay.length > 0 && (
-        <SelectedDayPanel
-          selectedDay={selectedDay}
-          photoCount={photosForDay.length}
-          prevPhotoDay={prevPhotoDay}
-          nextPhotoDay={nextPhotoDay}
-          tileRows={tileRows}
-          onNavigateDay={(d) => navigateToDay(d)}
-          onOpenLightbox={setLightboxIdx}
-          onClose={() => setSelectedDay(null)}
         />
       )}
 
@@ -275,7 +289,9 @@ function CalendarNavHeader({
 }) {
   return (
     <div className="flex items-center justify-between mb-4 shrink-0">
-      <div className="flex items-center gap-2">
+      {/* 日付変更 UI は日別パネルを開いていても操作できるよう常に最上位に置く
+          （右側の年・月/年切替は暗幕と一緒に暗くなる） */}
+      <div className="relative z-40 flex items-center gap-2">
         <button
           onClick={onPrev}
           disabled={!canGoBack}
@@ -526,59 +542,57 @@ function SelectedDayPanel({
   onClose: () => void;
 }) {
   return (
-    // カレンダーの上に重ねる。ライトボックス（z-50）より下のレイヤー。
-    <div className="absolute inset-0 z-40 flex flex-col">
-      <div className="absolute inset-0 bg-slate-900/70" onClick={onClose} />
-      <div className="relative flex-1 min-h-0 flex flex-col bg-slate-800 rounded-xl p-4 border border-slate-600/30 shadow-2xl">
-        <div className="flex items-center gap-2 mb-2 shrink-0">
-          <button
-            onClick={() => prevPhotoDay && onNavigateDay(prevPhotoDay)}
-            disabled={!prevPhotoDay}
-            className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h3 className="text-lg font-semibold text-app-primary">
-            {formatSelectedDay(selectedDay)}
-            <span className="text-sm text-slate-300 ml-2">{photoCount}枚</span>
-          </h3>
-          <button
-            onClick={() => nextPhotoDay && onNavigateDay(nextPhotoDay)}
-            disabled={!nextPhotoDay}
-            className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onClose}
-            aria-label={strings.calendar.closeDay}
-            title={strings.calendar.closeDay}
-            className="ml-auto p-1 rounded hover:bg-slate-700"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="flex-1 min-h-0">
-          <Virtuoso
-            totalCount={tileRows.length}
-            fixedItemHeight={ROW_HEIGHT}
-            itemContent={(rowIndex) => {
-              const row = tileRows[rowIndex];
-              return (
-                <div className="flex gap-2 pb-2">
-                  {row.items.map((p, i) => (
-                    <Thumbnail
-                      key={p.id}
-                      filePath={p.file_path}
-                      className="w-[130px] h-[130px] shrink-0 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-teal-400"
-                      onClick={() => onOpenLightbox(row.startIndex + i)}
-                    />
-                  ))}
-                </div>
-              );
-            }}
-          />
-        </div>
+    // カレンダーの島に上端・左右幅を揃えて重ねる島。
+    // 暗幕（z-20）より上、日付変更 UI（z-40）とライトボックス（z-50）より下。
+    <div className="absolute inset-0 z-30 flex flex-col bg-slate-800 rounded-xl p-4 border border-slate-600/30 shadow-2xl">
+      <div className="flex items-center gap-2 mb-2 shrink-0">
+        <button
+          onClick={() => prevPhotoDay && onNavigateDay(prevPhotoDay)}
+          disabled={!prevPhotoDay}
+          className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <h3 className="text-lg font-semibold text-app-primary">
+          {formatSelectedDay(selectedDay)}
+          <span className="text-sm text-slate-300 ml-2">{photoCount}枚</span>
+        </h3>
+        <button
+          onClick={() => nextPhotoDay && onNavigateDay(nextPhotoDay)}
+          disabled={!nextPhotoDay}
+          className="p-1 rounded hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+        <button
+          onClick={onClose}
+          aria-label={strings.calendar.closeDay}
+          title={strings.calendar.closeDay}
+          className="ml-auto p-1 rounded hover:bg-slate-700"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="flex-1 min-h-0">
+        <Virtuoso
+          totalCount={tileRows.length}
+          fixedItemHeight={ROW_HEIGHT}
+          itemContent={(rowIndex) => {
+            const row = tileRows[rowIndex];
+            return (
+              <div className="flex gap-2 pb-2">
+                {row.items.map((p, i) => (
+                  <Thumbnail
+                    key={p.id}
+                    filePath={p.file_path}
+                    className="w-[130px] h-[130px] shrink-0 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-teal-400"
+                    onClick={() => onOpenLightbox(row.startIndex + i)}
+                  />
+                ))}
+              </div>
+            );
+          }}
+        />
       </div>
     </div>
   );
