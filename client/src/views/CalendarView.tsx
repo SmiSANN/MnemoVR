@@ -289,9 +289,7 @@ function CalendarNavHeader({
 }) {
   return (
     <div className="flex items-center justify-between mb-4 shrink-0">
-      {/* 日付変更 UI は日別パネルを開いていても操作できるよう常に最上位に置く
-          （右側の年・月/年切替は暗幕と一緒に暗くなる） */}
-      <div className="relative z-40 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <button
           onClick={onPrev}
           disabled={!canGoBack}
@@ -543,7 +541,7 @@ function SelectedDayPanel({
 }) {
   return (
     // カレンダーの島に上端・左右幅を揃えて重ねる島。
-    // 暗幕（z-20）より上、日付変更 UI（z-40）とライトボックス（z-50）より下。
+    // 暗幕（z-20）より上、ライトボックス（z-50）より下。
     <div className="absolute inset-0 z-30 flex flex-col bg-slate-800 rounded-xl p-4 border border-slate-600/30 shadow-2xl">
       <div className="flex items-center gap-2 mb-2 shrink-0">
         <button
