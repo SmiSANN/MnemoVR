@@ -1,4 +1,9 @@
 fn main() {
+    // .env の作成・編集後にビルドスクリプトを再実行させる。
+    // これがないと cargo がキャッシュした出力を使い回し、
+    // .env を後から用意しても env! が「not defined at compile time」で失敗する。
+    println!("cargo:rerun-if-changed=../.env");
+
     // ローカル開発用: .env ファイルをコンパイル時に読み込んで env! マクロで参照できるようにする
     // CI では環境変数が直接設定されているためスキップされる
     if let Ok(contents) = std::fs::read_to_string("../.env") {
