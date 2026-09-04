@@ -39,6 +39,17 @@ export function CalendarView() {
     });
     return map;
   }, [photos]);
+  // 日付別の「その日の最新の写真」（カレンダーセルのサムネイル用）
+  const latestPhotoByDate = useMemo(() => {
+    const map = new Map<string, PhotoRecord>();
+    photos.forEach((p) => {
+      const key = toDateKey(p.captured_at);
+      const cur = map.get(key);
+      if (!cur || p.captured_at > cur.captured_at) map.set(key, p);
+    });
+    return map;
+  }, [photos]);
+
   const maxCount = useMemo(() => {
     // 大量データでも安全なよう、スプレッド（引数上限）ではなくループで最大値を求める
     let m = 1;
@@ -166,6 +177,7 @@ export function CalendarView() {
             month={month}
             clickable
             photosByDate={photosByDate}
+            latestPhotoByDate={latestPhotoByDate}
             maxCount={maxCount}
             selectedDay={selectedDay}
             onSelect={handleSelectDay}
@@ -392,6 +404,7 @@ function MonthGrid({
   month,
   clickable,
   photosByDate,
+  latestPhotoByDate,
   maxCount,
   selectedDay,
   onSelect,
@@ -400,6 +413,8 @@ function MonthGrid({
   month: number;
   clickable: boolean;
   photosByDate: Map<string, number>;
+  /** 日付キー→その日の最新の写真。月表示のセル内サムネイルに使う（年表示では未指定）。 */
+  latestPhotoByDate?: Map<string, PhotoRecord>;
   maxCount: number;
   selectedDay: string | null;
   onSelect?: (dateKey: string) => void;
@@ -407,7 +422,7 @@ function MonthGrid({
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const today = new Date();
-  const cellH = clickable ? "h-12" : "h-6";
+  const cellH = clickable ? "h-[4.5rem] sm:h-20" : "h-6";
 
   const cells: React.ReactNode[] = [];
   for (let i = 0; i < firstDay; i++) {
@@ -423,20 +438,39 @@ function MonthGrid({
     const bg = heatColor(count, maxCount);
     const textColors = heatTextColors(count, maxCount);
 
+    const latestPhoto = clickable ? latestPhotoByDate?.get(dateKey) : undefined;
+
     cells.push(
       <div
         key={day}
         onClick={() => clickable && count > 0 && onSelect?.(dateKey)}
-        className={`relative flex flex-col items-center justify-center rounded text-xs
+        className={`relative rounded text-xs overflow-hidden
           ${cellH}
+          ${clickable ? "flex flex-col p-1" : "flex flex-col items-center justify-center"}
           ${count > 0 && clickable ? "cursor-pointer hover:ring-1 hover:ring-teal-400" : ""}
           ${isToday ? "ring-1 ring-teal-400" : ""}
           ${isSelected ? "ring-2 ring-teal-300" : ""}
         `}
         style={bg ? { backgroundColor: bg } : undefined}
       >
-        <span className={isToday ? `font-bold ${textColors.day}` : textColors.day}>{day}</span>
-        {clickable && count > 0 && <span className={`text-[10px] ${textColors.count}`}>{count}</span>}
+        {clickable ? (
+          <>
+            <div className="flex items-baseline justify-between gap-1 px-0.5 leading-none shrink-0">
+              <span className={isToday ? `font-bold ${textColors.day}` : textColors.day}>{day}</span>
+              {count > 0 && <span className={`text-[10px] ${textColors.count}`}>{count}</span>}
+            </div>
+            {latestPhoto && (
+              <Thumbnail
+                key={latestPhoto.id}
+                filePath={latestPhoto.file_path}
+                fit="cover"
+                className="mt-0.5 flex-1 min-h-0 w-full rounded-[3px] overflow-hidden bg-black/20"
+              />
+            )}
+          </>
+        ) : (
+          <span className={isToday ? `font-bold ${textColors.day}` : textColors.day}>{day}</span>
+        )}
       </div>,
     );
   }
