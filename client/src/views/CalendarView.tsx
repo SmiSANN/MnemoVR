@@ -183,11 +183,12 @@ export function CalendarView() {
         onViewModeChange={setViewMode}
       />
 
-      {/* 暗幕。slate-900 はライト系テーマでは明るい色になり暗幕にならないため、
-          他のモーダル（UpdateDialog など）と同じくテーマ非依存の黒を使う */}
+      {/* 暗幕。ビューの外側に p-6 の余白があり absolute inset-0 では
+          暗くならない縁が残るため、他のモーダルと同じく fixed で画面全体を覆う。
+          色は slate-900 だとライト系テーマで明るくなってしまうのでテーマ非依存の黒。 */}
       {dayPanelOpen && (
         <div
-          className="absolute inset-0 z-20 bg-black/60"
+          className="fixed inset-0 z-20 bg-black/60"
           onClick={() => setSelectedDay(null)}
         />
       )}
